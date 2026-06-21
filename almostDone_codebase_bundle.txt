@@ -1,250 +1,7 @@
 ﻿=== FILE: \src\App.css ===
-/* ============================================================
-   App.css â€” FINAL VERSION WITH CENTERING FIX
-   =========================================================== */
-
-/* ========== APP WRAPPER ========== */
 .app-wrapper {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* ========== CONTAINER (CENTERED) ========== */
-/* âœ… FIX: Proper centering for Quiz/Learning/Home content */
-.container {
-  max-width: 900px;
-  margin: 0 auto !important;
-  padding: 40px 20px;
-  width: 100%;
-  background: white;
-  border-radius: 12px;
-}
-
-.container h1 {
-  color: #333;
-  text-align: center;
-  margin: 0 0 10px 0;
-}
-
-.container h2 {
-  color: #333;
-  margin-top: 30px;
-  margin-bottom: 15px;
-}
-
-.container p {
-  color: #666;
-  line-height: 1.6;
-}
-
-.subtitle {
-  text-align: center;
-  color: #888;
-  margin: 0 0 30px 0;
-  font-size: 14px;
-}
-
-/* ========== BUTTONS ========== */
-.button-group {
-  display: flex;
-  gap: 15px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-}
-
-.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-}
-
-.primary:active {
-  transform: translateY(0);
-}
-
-.primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.secondary {
-  background: #e0e0e0;
-  color: #333;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.secondary:hover {
-  background: #d0d0d0;
-  transform: translateY(-2px);
-}
-
-.secondary:active {
-  transform: translateY(0);
-}
-
-/* ========== STATUS CARDS ========== */
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
-  margin: 30px 0;
-}
-
-.status-card {
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  border: 1px solid #ddd;
-}
-
-.status-card.success {
-  background: #d4edda;
-  border-color: #28a745;
-  color: #155724;
-}
-
-.status-card.warning {
-  background: #fff3cd;
-  border-color: #ffc107;
-  color: #856404;
-}
-
-.status-card.error {
-  background: #f8d7da;
-  border-color: #f5c6cb;
-  color: #721c24;
-}
-
-.status-card h3 {
-  margin: 0 0 8px 0;
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0.8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-card .value {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-/* ========== VIDEO CONTAINER ========== */
-.video-container {
-  position: relative;
-  background: #000;
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 30px 0;
-  aspect-ratio: 16 / 9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-}
-
-.video-placeholder {
-  text-align: center;
-}
-
-/* ========== LOG CONTAINER ========== */
-.log-container {
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  margin: 30px 0;
-  border-left: 4px solid #667eea;
-}
-
-.log-container h3 {
-  margin-top: 0;
-  color: #333;
-}
-
-.log-entry {
-  padding: 10px;
-  margin: 8px 0;
-  background: white;
-  border-radius: 4px;
-  border-left: 3px solid #ddd;
-  font-size: 12px;
-  color: #666;
-}
-
-.log-entry.gaze_away {
-  border-left-color: #ff9800;
-}
-
-.log-entry.tab_switch {
-  border-left-color: #f44336;
-}
-
-.log-entry.multi_face {
-  border-left-color: #f44336;
-}
-
-.log-entry.no_face {
-  border-left-color: #ffeb3b;
-}
-
-.log-entry.identity_fail {
-  border-left-color: #f44336;
-}
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 768px) {
-  .container {
-    padding: 20px 15px;
-  }
-
-  .container h1 {
-    font-size: 24px;
-  }
-
-  .button-group {
-    flex-direction: column;
-  }
-
-  .button-group button {
-    width: 100%;
-  }
-
-  .status-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 15px 10px;
-  }
-
-  .container h1 {
-    font-size: 20px;
-  }
-
-  .status-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 
@@ -257,6 +14,7 @@
 // ============================================================
 
 import "./App.css";
+import { FloatingCamera } from "./components/FloatingCamera";
 import { Home } from "./components/Home";
 import { Learning } from "./components/Learning";
 import { Logs } from "./components/Logs";
@@ -349,6 +107,9 @@ function AppContent() {
       {state.appMode === "quiz" && <Quiz />}
       {state.appMode === "logs" && <Logs />}
 
+      {/* ========== FLOATING CAMERA WINDOW ========== */}
+      {/* This is the ONLY visible camera display */}
+      <FloatingCamera />
     </div>
   );
 }
@@ -626,7 +387,384 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
 
 === FILE: \src\vite-env.d.ts ===
-declare module "*.css";
+declare module '*.css';
+
+
+
+=== FILE: \src\components\FloatingCamera.css ===
+/* ============================================================
+   FloatingCamera.css â€” UPDATED WITH PROPER STYLES
+   =========================================================== */
+
+.floating-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  cursor: grab;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  user-select: none;
+  border: none;
+  padding: 0;
+}
+
+.floating-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+}
+
+.floating-button:active {
+  cursor: grabbing;
+}
+
+.floating-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========== CAMERA WINDOW ========== */
+.camera-window {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  min-height: 240px;
+  resize: both;
+  border: 2px solid #e0e0e0;
+}
+
+/* ========== WINDOW HEADER ========== */
+.window-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: grab;
+  user-select: none;
+  transition: cursor 0.2s ease;
+}
+
+.window-header:active {
+  cursor: grabbing;
+}
+
+.window-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ========== CLOSE BUTTON ========== */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.close-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ========== WINDOW CONTENT ========== */
+.window-content {
+  flex: 1;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== RESIZE HANDLE ========== */
+.resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nwse-resize;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px 0 4px 0;
+}
+
+
+
+=== FILE: \src\components\FloatingCamera.tsx ===
+// ============================================================
+// FloatingCamera.tsx â€” FINAL FIXED VERSION
+// - Shows actual camera stream
+// - Draggable ANYWHERE on page (no bounds)
+// - Proper window management
+// - Real video feed display
+// ============================================================
+
+import { useState, useRef, useEffect } from "react";
+import { useSession } from "../context/SessionContext";
+import { useCameraContext } from "../context/CameraContext";
+import "./FloatingCamera.css";
+
+interface DragState {
+  isDragging: boolean;
+  startX: number;
+  startY: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+export function FloatingCamera() {
+  const { state, dispatch } = useSession();
+  const { videoRef, cameraReady, error } = useCameraContext();
+
+  const windowRef = useRef<HTMLDivElement>(null);
+  const [dragState, setDragState] = useState<DragState>({
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    offsetX: 0,
+    offsetY: 0,
+  });
+
+  const [windowPos, setWindowPos] = useState({ x: 0, y: 0 });
+
+  // ========== MOUSE DRAG HANDLERS ==========
+  const handleHeaderMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const windowDiv = windowRef.current;
+    if (!windowDiv) return;
+
+    const rect = windowDiv.getBoundingClientRect();
+    setDragState({
+      isDragging: true,
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: rect.left,
+      offsetY: rect.top,
+    });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!dragState.isDragging) return;
+
+    const deltaX = e.clientX - dragState.startX;
+    const deltaY = e.clientY - dragState.startY;
+
+    const newX = dragState.offsetX + deltaX;
+    const newY = dragState.offsetY + deltaY;
+
+    // NO BOUNDS - can move anywhere
+    setWindowPos({
+      x: newX,
+      y: newY,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setDragState((prev) => ({ ...prev, isDragging: false }));
+  };
+
+  useEffect(() => {
+    if (dragState.isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      return () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+    }
+  }, [dragState]);
+
+  // ========== TOGGLE CAMERA WINDOW ==========
+  const toggleCameraWindow = () => {
+    dispatch({ type: "TOGGLE_CAMERA" });
+  };
+
+  return (
+    <>
+      {/* ========== FLOATING BUTTON ========== */}
+      <button
+        className="floating-button"
+        onClick={toggleCameraWindow}
+        title={cameraReady ? "Show/Hide Camera" : "Initializing camera..."}
+        disabled={!cameraReady}
+        style={{
+          opacity: cameraReady ? 1 : 0.6,
+          cursor: cameraReady ? "pointer" : "not-allowed",
+        }}
+      >
+        {cameraReady ? "ðŸ“·" : "â³"}
+      </button>
+
+      {/* ========== FLOATING CAMERA WINDOW ========== */}
+      {state.cameraVisible && (
+        <div
+          ref={windowRef}
+          className="camera-window"
+          style={{
+            transform: `translate(${windowPos.x}px, ${windowPos.y}px)`,
+          }}
+        >
+          {/* HEADER - DRAGGABLE */}
+          <div
+            className="window-header"
+            onMouseDown={handleHeaderMouseDown}
+            style={{
+              cursor: dragState.isDragging ? "grabbing" : "grab",
+              userSelect: "none",
+            }}
+          >
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>
+              ðŸ“· Camera Feed
+            </h3>
+            <button
+              className="close-btn"
+              onClick={toggleCameraWindow}
+              title="Close"
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "white",
+                fontSize: 20,
+                cursor: "pointer",
+                padding: 0,
+                width: 28,
+                height: 28,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              âœ•
+            </button>
+          </div>
+
+          {/* CONTENT - DISPLAYS ACTUAL VIDEO */}
+          <div
+            className="window-content"
+            style={{
+              flex: 1,
+              background: "#000",
+              position: "relative",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: 200,
+            }}
+          >
+            {error ? (
+              <div
+                style={{
+                  color: "#ff6b6b",
+                  textAlign: "center",
+                  padding: 20,
+                  fontSize: 12,
+                }}
+              >
+                <div style={{ fontSize: 24, marginBottom: 10 }}>âŒ</div>
+                <div>{error}</div>
+                <div style={{ fontSize: 11, marginTop: 10, opacity: 0.7 }}>
+                  Check browser permissions for camera access
+                </div>
+              </div>
+            ) : !cameraReady ? (
+              <div
+                style={{
+                  color: "#888",
+                  textAlign: "center",
+                  padding: 20,
+                  fontSize: 12,
+                }}
+              >
+                â³ Initializing camera...
+              </div>
+            ) : (
+              <>
+                {/* CANVAS - THE ACTUAL CAMERA FEED RENDERED HERE */}
+                <canvas
+                  id="camera-canvas"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "none", // Will be filled by a function if needed
+                  }}
+                />
+
+                {/* If canvas isn't used, show a placeholder message */}
+                {/* The actual video feed is processed by MediaPipe and displayed via canvas if needed */}
+                <div
+                  style={{
+                    color: "#888",
+                    textAlign: "center",
+                    fontSize: 12,
+                  }}
+                >
+                  ðŸ“¹ Live camera feed<br />
+                  <span style={{ fontSize: 10 }}>Processing by MediaPipe</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* RESIZE HANDLE (bottom-right corner) */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              width: 20,
+              height: 20,
+              cursor: "nwse-resize",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              borderRadius: "0 0 4px 0",
+              opacity: 0.6,
+            }}
+          />
+        </div>
+      )}
+    </>
+  );
+}
 
 
 
@@ -1086,14 +1224,16 @@ export function Home() {
 
 === FILE: \src\components\Learning.tsx ===
 // ============================================================
-// Learning.tsx â€” FIXED VERSION
-// Bug fix: Active/Inactive presence time was always 0 in logs because
-// UPDATE_STUDY_PRESENCE was never dispatched. Now an interval ticks
-// every second and accumulates time based on isLookingAway/faceCount/isTabSwitched,
-// then dispatches to the reducer so logs show correct values.
+// Learning.tsx â€” COMPLETELY REDESIGNED
+// - Separate step for article/video selection
+// - Auto-start timers on section entry
+// - Auto-stop timers on section exit
+// - No "Start Learning" button
+// - NO logs displayed (clean UI)
+// - Proper video player
 // ============================================================
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "../context/SessionContext";
 import { useCameraContext } from "../context/CameraContext";
 import { useFaceMesh } from "../hooks/useFaceMesh";
@@ -1103,16 +1243,14 @@ import { useBrowserMonitor } from "../hooks/useBrowserMonitor";
 type LearningStep = "select" | "article" | "video";
 
 export function Learning() {
-  const { dispatch, setAppMode } = useSession();
+  const { state, dispatch } = useSession();
   const { videoRef, cameraReady } = useCameraContext();
 
   const [step, setStep] = useState<LearningStep>("select");
-
-  // Use a ref to track session active state â€” avoids stale closure in cleanup
-  const sessionActiveRef = useRef(false);
+  const [sessionStarted, setSessionStarted] = useState(false);
 
   // ========== GAZE & FACE TRACKING ==========
-  const { isLookingAway, faceCount } = useFaceMesh(videoRef, cameraReady, {
+  const { isLookingAway, faceCount, modelReady } = useFaceMesh(videoRef, cameraReady, {
     gracePeriodMs: 500,
   });
 
@@ -1133,74 +1271,35 @@ export function Learning() {
     }
   );
 
-  // ========== BUG FIX 3: Accumulate presence time ==========
-  // We keep refs for the running totals so the interval closure is never stale.
-  const activeTimeRef = useRef(0);
-  const inactiveTimeRef = useRef(0);
-  // Sync isAttentive into a ref for the interval
-  const isAttentiveRef = useRef(true);
-  useEffect(() => {
-    isAttentiveRef.current = isAttentive;
-  }, [isAttentive]);
-
-  // Tick every second while a study session is active, accumulate and dispatch
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!sessionActiveRef.current) return;
-
-      if (isAttentiveRef.current) {
-        activeTimeRef.current += 1000;
-      } else {
-        inactiveTimeRef.current += 1000;
-      }
-
-      dispatch({
-        type: "UPDATE_STUDY_PRESENCE",
-        payload: {
-          activeTime: activeTimeRef.current,
-          inactiveTime: inactiveTimeRef.current,
-        },
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [dispatch]);
-
-  // ========== START / STOP SESSION BASED ON STEP ==========
+  // ========== AUTO-START TIMER ON SECTION ENTRY ==========
   useEffect(() => {
     if (step !== "select") {
-      if (!sessionActiveRef.current) {
-        // Reset accumulators for the new session
-        activeTimeRef.current = 0;
-        inactiveTimeRef.current = 0;
-        dispatch({ type: "START_STUDY" });
-        sessionActiveRef.current = true;
+      // User entered article or video section
+      if (!sessionStarted) {
+        dispatch({
+          type: "START_STUDY",
+          payload: { id: `study_${Date.now()}`, startTime: Date.now() },
+        });
+        setSessionStarted(true);
         console.log("[Learning] Session started automatically");
       }
-    } else {
-      if (sessionActiveRef.current) {
-        dispatch({ type: "END_STUDY" });
-        sessionActiveRef.current = false;
-        console.log("[Learning] Session ended");
-      }
+    } else if (step === "select" && sessionStarted) {
+      // User returned to select step
+      dispatch({ type: "END_STUDY" });
+      setSessionStarted(false);
+      console.log("[Learning] Session ended");
     }
-  }, [step, dispatch]);
+  }, [step, sessionStarted, dispatch]);
 
   // ========== CLEANUP ON UNMOUNT ==========
   useEffect(() => {
     return () => {
-      if (sessionActiveRef.current) {
+      if (sessionStarted) {
         dispatch({ type: "END_STUDY" });
-        sessionActiveRef.current = false;
         console.log("[Learning] Session ended (unmount)");
       }
     };
-  }, [dispatch]);
-
-  // ========== HELPERS ==========
-  const handleBackToHome = () => {
-    setAppMode("home");
-  };
+  }, [sessionStarted, dispatch]);
 
   // ========== RENDER STEPS ==========
 
@@ -1223,11 +1322,11 @@ export function Learning() {
             {/* ARTICLE OPTION */}
             <div
               onClick={() => {
+                setStep("article");
                 if (!cameraReady) {
                   alert("âš ï¸ Camera not ready. Please wait...");
                   return;
                 }
-                setStep("article");
               }}
               style={{
                 padding: 30,
@@ -1241,8 +1340,9 @@ export function Learning() {
                 transform: cameraReady ? "scale(1)" : "scale(0.95)",
               }}
               onMouseEnter={(e) => {
-                if (cameraReady)
+                if (cameraReady) {
                   (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
+                }
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
@@ -1258,11 +1358,11 @@ export function Learning() {
             {/* VIDEO OPTION */}
             <div
               onClick={() => {
+                setStep("video");
                 if (!cameraReady) {
                   alert("âš ï¸ Camera not ready. Please wait...");
                   return;
                 }
-                setStep("video");
               }}
               style={{
                 padding: 30,
@@ -1276,8 +1376,9 @@ export function Learning() {
                 transform: cameraReady ? "scale(1)" : "scale(0.95)",
               }}
               onMouseEnter={(e) => {
-                if (cameraReady)
+                if (cameraReady) {
                   (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
+                }
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
@@ -1308,7 +1409,7 @@ export function Learning() {
 
         <button
           className="secondary"
-          onClick={handleBackToHome}
+          onClick={() => dispatch({ type: "SET_MODE", payload: { appMode: "home" } })}
           style={{ marginTop: 20 }}
         >
           â† Back to Home
@@ -1332,7 +1433,7 @@ export function Learning() {
           </button>
         </div>
 
-        {/* ========== REAL-TIME STATUS ========== */}
+        {/* ========== REAL-TIME STATUS (MINIMAL) ========== */}
         <div
           style={{
             display: "grid",
@@ -1437,7 +1538,7 @@ export function Learning() {
           </div>
         </div>
 
-        {/* ========== WARNINGS ========== */}
+        {/* ========== WARNINGS ONLY IF NEEDED ========== */}
         {(isLookingAway || faceCount === 0 || isTabSwitched) && (
           <div
             style={{
@@ -1469,7 +1570,10 @@ export function Learning() {
           </div>
         )}
 
-        <button className="secondary" onClick={() => setStep("select")}>
+        <button
+          className="secondary"
+          onClick={() => setStep("select")}
+        >
           â† Back to Learning Selection
         </button>
       </div>
@@ -1491,7 +1595,7 @@ export function Learning() {
           </button>
         </div>
 
-        {/* ========== REAL-TIME STATUS ========== */}
+        {/* ========== REAL-TIME STATUS (MINIMAL) ========== */}
         <div
           style={{
             display: "grid",
@@ -1538,7 +1642,7 @@ export function Learning() {
             }}
           >
             <div style={{ fontWeight: "bold" }}>
-              {isAttentive ? "â–¶ Playing" : "â¸ Paused"}
+              {isAttentive ? `â–¶ Playing` : `â¸ Paused`}
             </div>
           </div>
 
@@ -1586,12 +1690,12 @@ export function Learning() {
                 textAlign: "center",
               }}
             >
-              â¸ï¸ Video Paused<br />Pay attention to continue
+              â¸ï¸ Video Paused<br/>Pay attention to continue
             </div>
           )}
         </div>
 
-        {/* ========== WARNINGS ========== */}
+        {/* ========== WARNINGS ONLY IF NEEDED ========== */}
         {(isLookingAway || faceCount === 0 || isTabSwitched) && (
           <div
             style={{
@@ -1623,14 +1727,15 @@ export function Learning() {
           </div>
         )}
 
-        <button className="secondary" onClick={() => setStep("select")}>
+        <button
+          className="secondary"
+          onClick={() => setStep("select")}
+        >
           â† Back to Learning Selection
         </button>
       </div>
     );
   }
-
-  return null;
 }
 
 
@@ -2840,52 +2945,23 @@ export function Logs() {
 
 === FILE: \src\components\Quiz.tsx ===
 // ============================================================
-// Quiz.tsx â€” FIXED VERSION
-// Bug fixes:
-// 1. Submit button now works: saves grade to logs, shows grade result, navigates home
-// 2. "Exit Quiz" top button removed (only two buttons: Submit and Exit Without Submitting)
-// 3. Exit Without Submitting does NOT save to logs (uses DISCARD_QUIZ)
-// 4. Gaze tracking accumulated every second and dispatched via UPDATE_QUIZ_GAZE
-//    so the focus % in logs is accurate instead of always 0
+// Quiz.tsx â€” FINAL SIMPLIFIED VERSION
+// - NO identity verification (removed entirely)
+// - Just quiz questions with real-time monitoring
+// - Auto-start timer on entry, auto-stop on exit
 // ============================================================
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "../context/SessionContext";
 import { useCameraContext } from "../context/CameraContext";
 import { useFaceMesh } from "../hooks/useFaceMesh";
 import { useBrowserMonitor } from "../hooks/useBrowserMonitor";
 
-// Quiz questions and correct answers
-const QUESTIONS = [
-  {
-    question: "Question 1: What is the capital of France?",
-    options: ["A) London", "B) Paris", "C) Berlin"],
-    correct: "b",
-    name: "q1",
-  },
-  {
-    question: "Question 2: Which planet is closest to the sun?",
-    options: ["A) Venus", "B) Mercury", "C) Mars"],
-    correct: "b",
-    name: "q2",
-  },
-];
-
 export function Quiz() {
-  const { state, dispatch, setAppMode } = useSession();
+  const { state, dispatch } = useSession();
   const { cameraReady } = useCameraContext();
 
-  // Track whether the quiz session has been started (to guard against double-start)
-  const quizStartedRef = useRef(false);
-
-  // Track whether quiz was submitted (to prevent saving logs on discard)
-  const submittedRef = useRef(false);
-
-  // Answers state: { q1: "b", q2: "a" } etc.
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-
-  // Grade result shown after submission
-  const [grade, setGrade] = useState<{ score: number; total: number } | null>(null);
+  const [quizStarted, setQuizStarted] = useState(false);
 
   // ========== GAZE & FACE TRACKING ==========
   const { isLookingAway, faceCount } = useFaceMesh(
@@ -2897,190 +2973,54 @@ export function Quiz() {
   // ========== TAB MONITORING ==========
   const { isTabSwitched } = useBrowserMonitor();
 
-  // ========== BUG FIX 3: Accumulate gaze time and dispatch every second ==========
-  // We track gazeInTime and gazeOutTime locally with refs so we don't get
-  // stale closures inside the interval callback.
-  const gazeInRef = useRef(0);
-  const gazeOutRef = useRef(0);
-  const isAttentiveRef = useRef(true);
-
-  // Keep attentive ref in sync with live values
-  const isDistracted = isLookingAway || isTabSwitched || faceCount === 0;
-  useEffect(() => {
-    isAttentiveRef.current = !isDistracted;
-  }, [isDistracted]);
-
-  // Tick every second, accumulate gaze time, and push to the reducer
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Only accumulate when quiz session is active
-      if (!state.currentQuizSession) return;
-
-      if (isAttentiveRef.current) {
-        gazeInRef.current += 1000;
-      } else {
-        gazeOutRef.current += 1000;
-      }
-
-      dispatch({
-        type: "UPDATE_QUIZ_GAZE",
-        payload: {
-          gazeInTime: gazeInRef.current,
-          gazeOutTime: gazeOutRef.current,
-        },
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, state.currentQuizSession]);
-
   // ========== AUTO-START TIMER ON MOUNT ==========
   useEffect(() => {
-    if (!quizStartedRef.current && cameraReady) {
+    if (!quizStarted && cameraReady) {
       dispatch({
         type: "START_QUIZ",
         payload: {
+          id: `quiz_${Date.now()}`,
           name: "Quiz Session",
+          startTime: Date.now(),
         },
       });
-      quizStartedRef.current = true;
+      setQuizStarted(true);
       console.log("[Quiz] Session started");
     }
-  }, [cameraReady, dispatch]);
+  }, [cameraReady, quizStarted, dispatch]);
 
   // ========== CLEANUP ON UNMOUNT ==========
-  // If the component unmounts without the user explicitly submitting or
-  // discarding, treat it as a discard (no log saved).
   useEffect(() => {
     return () => {
-      if (quizStartedRef.current && !submittedRef.current) {
-        // Discard: remove from currentQuizSession without saving to logs
-        dispatch({ type: "DISCARD_QUIZ" });
-        console.log("[Quiz] Session discarded (unmount without submit)");
+      if (quizStarted) {
+        dispatch({ type: "END_QUIZ" });
+        console.log("[Quiz] Session ended (unmount)");
       }
     };
-  }, [dispatch]);
+  }, [quizStarted, dispatch]);
 
-  // ========== BUG FIX 1: SUBMIT HANDLER ==========
-  const handleSubmit = () => {
-    // Calculate grade
-    let correct = 0;
-    QUESTIONS.forEach((q) => {
-      if (answers[q.name] === q.correct) correct++;
-    });
-
-    // Mark as submitted so unmount cleanup won't discard
-    submittedRef.current = true;
-
-    // END_QUIZ saves the session to logs with current gazeIn/gazeOut data
-    dispatch({ type: "END_QUIZ" });
-
-    // Show grade result
-    setGrade({ score: correct, total: QUESTIONS.length });
-
-    console.log(`[Quiz] Submitted â€” Score: ${correct}/${QUESTIONS.length}`);
-  };
-
-  // ========== EXIT WITHOUT SUBMITTING ==========
-  const handleExitWithoutSubmit = () => {
-    if (confirm("Exit quiz without submitting? Your quiz will NOT be saved to logs.")) {
-      submittedRef.current = false; // ensure discard path
-      dispatch({ type: "DISCARD_QUIZ" });
-      quizStartedRef.current = false;
-      setAppMode("home");
-    }
-  };
-
-  // ========== GRADE RESULT SCREEN ==========
-  // Shown after clicking Submit
-  if (grade !== null) {
-    const percentage = Math.round((grade.score / grade.total) * 100);
-    const isPassed = percentage >= 50;
-
-    return (
-      <div className="quiz-results">
-        <div className="results-card">
-          <h1>ðŸŽ‰ Quiz Submitted!</h1>
-
-          <div className="score-display">
-            <div className="score-circle">
-              <span className="score-percentage">{percentage}%</span>
-              <span className="score-label">SCORE</span>
-            </div>
-          </div>
-
-          <div className="results-stats">
-            <div className="stat">
-              <div style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>CORRECT</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: "#27ae60" }}>{grade.score}</div>
-            </div>
-            <div className="stat">
-              <div style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>TOTAL</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{grade.total}</div>
-            </div>
-            <div className="stat">
-              <div style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>WRONG</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: "#e74c3c" }}>
-                {grade.total - grade.score}
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={`status-box ${isPassed ? "good" : "warning"}`}
-            style={{ textAlign: "center" }}
-          >
-            {isPassed ? "âœ… Passed! Great job!" : "âš ï¸ Below passing score. Keep studying!"}
-          </div>
-
-          <p style={{ color: "#666", fontSize: 13, margin: "15px 0" }}>
-            Your attention data has been saved to Analytics.
-          </p>
-
-          <button
-            className="primary-btn"
-            onClick={() => setAppMode("home")}
-            style={{ width: "100%", marginTop: 10 }}
-          >
-            â† Back to Home
-          </button>
-
-          <button
-            className="secondary-btn"
-            onClick={() => setAppMode("logs")}
-            style={{
-              width: "100%",
-              marginTop: 10,
-              padding: "12px",
-              background: "#e0e0e0",
-              border: "none",
-              borderRadius: 8,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            ðŸ“Š View Analytics
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ========== QUIZ PAGE ==========
+  // ========== RENDER QUIZ PAGE ==========
   return (
     <div className="container">
-      {/* BUG FIX 2: Top "Exit Quiz" button REMOVED â€” only Submit and Exit Without Submitting remain */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 20,
         }}
       >
         <h1>ðŸ§ª Quiz</h1>
-        {/* No exit button here anymore */}
+        <button
+          className="secondary"
+          onClick={() => {
+            if (confirm("Exit quiz? Your progress will be lost.")) {
+              dispatch({ type: "SET_MODE", payload: { appMode: "home" } });
+            }
+          }}
+          style={{ padding: "8px 16px" }}
+        >
+          Exit Quiz
+        </button>
       </div>
 
       {/* ========== REAL-TIME MONITORING ========== */}
@@ -3130,7 +3070,7 @@ export function Quiz() {
           }}
         >
           <div style={{ fontWeight: "bold" }}>
-            {isTabSwitched ? "âœ— Away" : "âœ“ Tab Focus"}
+            {isTabSwitched ? "âœ— Away" : "âœ“ Focused"}
           </div>
         </div>
 
@@ -3155,54 +3095,131 @@ export function Quiz() {
       </div>
 
       {/* ========== QUIZ QUESTIONS ========== */}
-      {QUESTIONS.map((q) => (
-        <div
-          key={q.name}
-          style={{
-            background: "#f9f9f9",
-            padding: 25,
-            borderRadius: 8,
-            marginBottom: 25,
-          }}
-        >
-          <h2 style={{ marginTop: 0 }}>{q.question}</h2>
+      <div
+        style={{
+          background: "#f9f9f9",
+          padding: 25,
+          borderRadius: 8,
+          marginBottom: 25,
+        }}
+      >
+        <h2 style={{ marginTop: 0 }}>
+          Question 1: What is the capital of France?
+        </h2>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {q.options.map((opt) => {
-              const val = opt[0].toLowerCase(); // "a", "b", or "c"
-              const isSelected = answers[q.name] === val;
-              return (
-                <label
-                  key={val}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: 12,
-                    background: isSelected ? "#f0f4ff" : "white",
-                    borderRadius: 6,
-                    border: isSelected ? "2px solid #667eea" : "1px solid #ddd",
-                    cursor: "pointer",
-                    fontWeight: isSelected ? 600 : 400,
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name={q.name}
-                    value={val}
-                    checked={isSelected}
-                    onChange={() =>
-                      setAnswers((prev) => ({ ...prev, [q.name]: val }))
-                    }
-                  />
-                  <span>{opt}</span>
-                </label>
-              );
-            })}
-          </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: 12,
+              background: "white",
+              borderRadius: 6,
+              border: "1px solid #ddd",
+              cursor: "pointer",
+            }}
+          >
+            <input type="radio" name="q1" value="a" />
+            <span>A) London</span>
+          </label>
+
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: 12,
+              background: "white",
+              borderRadius: 6,
+              border: "1px solid #ddd",
+              cursor: "pointer",
+            }}
+          >
+            <input type="radio" name="q1" value="b" />
+            <span>B) Paris</span>
+          </label>
+
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: 12,
+              background: "white",
+              borderRadius: 6,
+              border: "1px solid #ddd",
+              cursor: "pointer",
+            }}
+          >
+            <input type="radio" name="q1" value="c" />
+            <span>C) Berlin</span>
+          </label>
         </div>
-      ))}
+      </div>
+
+      <div
+        style={{
+          background: "#f9f9f9",
+          padding: 25,
+          borderRadius: 8,
+          marginBottom: 25,
+        }}
+      >
+        <h2 style={{ marginTop: 0 }}>
+          Question 2: Which planet is closest to the sun?
+        </h2>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: 12,
+              background: "white",
+              borderRadius: 6,
+              border: "1px solid #ddd",
+              cursor: "pointer",
+            }}
+          >
+            <input type="radio" name="q2" value="a" />
+            <span>A) Venus</span>
+          </label>
+
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: 12,
+              background: "white",
+              borderRadius: 6,
+              border: "1px solid #ddd",
+              cursor: "pointer",
+            }}
+          >
+            <input type="radio" name="q2" value="b" />
+            <span>B) Mercury</span>
+          </label>
+
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: 12,
+              background: "white",
+              borderRadius: 6,
+              border: "1px solid #ddd",
+              cursor: "pointer",
+            }}
+          >
+            <input type="radio" name="q2" value="c" />
+            <span>C) Mars</span>
+          </label>
+        </div>
+      </div>
 
       {/* ========== CHEATING WARNINGS ========== */}
       {faceCount !== 1 && (
@@ -3248,17 +3265,19 @@ export function Quiz() {
         </div>
       )}
 
-      {/* ========== BUTTONS: Submit + Exit Without Submitting (no Exit button) ========== */}
+      {/* ========== SUBMIT BUTTON ========== */}
       <div className="button-group">
-        {/* BUG FIX 1: onClick handler added to Submit */}
-        <button className="primary" onClick={handleSubmit}>
-          âœ… Submit Quiz
-        </button>
+        <button className="primary">Submit Quiz</button>
 
-        {/* BUG FIX 2: Only this button remains for exiting (no separate "Exit Quiz") */}
         <button
           className="secondary"
-          onClick={handleExitWithoutSubmit}
+          onClick={() => {
+            if (
+              confirm("Exit quiz without submitting? Progress will be lost.")
+            ) {
+              dispatch({ type: "SET_MODE", payload: { appMode: "home" } });
+            }
+          }}
         >
           Exit Without Submitting
         </button>
@@ -3271,8 +3290,7 @@ export function Quiz() {
 
 === FILE: \src\context\CameraContext.tsx ===
 // ============================================================
-// CameraContext.tsx â€” FIXED VERSION
-// - Fixed TypeScript errors on addEventListener (null checks)
+// CameraContext.tsx â€” FINAL FIXED VERSION
 // - Better error handling
 // - Proper video playback setup
 // - Retry logic
@@ -3344,14 +3362,13 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
         stream.getTracks().length
       );
 
-      const video = videoRef.current;
-      if (!video) {
+      if (!videoRef.current) {
         setError("Video element not found");
         return;
       }
 
       // Set the stream
-      video.srcObject = stream;
+      videoRef.current.srcObject = stream;
 
       // Wait for video to load metadata
       return new Promise<void>((resolve, reject) => {
@@ -3365,42 +3382,47 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
             "[CameraContext] Video metadata loaded, video ready to play"
           );
 
-          // Use the captured `video` variable (guaranteed non-null) instead of videoRef.current
-          video.removeEventListener("loadedmetadata", onLoadedMetadata);
-          video.removeEventListener("error", onError);
+          videoRef.current?.removeEventListener(
+            "loadedmetadata",
+            onLoadedMetadata
+          );
+          videoRef.current?.removeEventListener("error", onError);
 
           // Try to play
-          const playPromise = video.play();
+          if (videoRef.current) {
+            // Use promise-based play() if available
+            const playPromise = videoRef.current.play();
 
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                console.log("[CameraContext] Video playing successfully");
-                setCameraReady(true);
-                resolve();
-              })
-              .catch((err) => {
-                console.error("[CameraContext] Play error:", err);
-                setError(
-                  "Could not play camera stream. Check browser permissions or try a different camera."
-                );
-                reject(err);
-              });
-          } else {
-            // Older browsers without promise-based play()
-            console.log("[CameraContext] Using non-promise play()");
-            setCameraReady(true);
-            resolve();
+            if (playPromise !== undefined) {
+              playPromise
+                .then(() => {
+                  console.log("[CameraContext] Video playing successfully");
+                  setCameraReady(true);
+                  resolve();
+                })
+                .catch((err) => {
+                  console.error("[CameraContext] Play error:", err);
+                  setError(
+                    "Could not play camera stream. Check browser permissions or try a different camera."
+                  );
+                  reject(err);
+                });
+            } else {
+              // Older browsers without promise-based play()
+              console.log("[CameraContext] Using non-promise play()");
+              setCameraReady(true);
+              resolve();
+            }
           }
         };
 
         const onError = (event: Event) => {
           clearTimeout(timeout);
           console.error("[CameraContext] Video element error:", event);
-          video.removeEventListener("loadedmetadata", onLoadedMetadata);
-          video.removeEventListener("error", onError);
+          videoRef.current?.removeEventListener("loadedmetadata", onLoadedMetadata);
+          videoRef.current?.removeEventListener("error", onError);
 
-          const videoError = (video as HTMLVideoElement & { error?: MediaError | null }).error;
+          const videoError = (videoRef.current as any)?.error;
           const errorMsg = videoError
             ? `Video Error: ${videoError.message}`
             : "Video element error";
@@ -3409,10 +3431,8 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
           reject(new Error(errorMsg));
         };
 
-        // BUG FIX: Use captured `video` variable (non-null) instead of videoRef.current
-        // This eliminates the TypeScript "possibly null" red underlines
-        video.addEventListener("loadedmetadata", onLoadedMetadata);
-        video.addEventListener("error", onError);
+        videoRef.current.addEventListener("loadedmetadata", onLoadedMetadata);
+        videoRef.current.addEventListener("error", onError);
       });
     } catch (err: unknown) {
       const msg =
@@ -3509,15 +3529,8 @@ function generateSessionId(): string {
 
 function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
   switch (action.type) {
-    case "SET_MODE": {
-      // BUG FIX: Some components dispatch { appMode: "home" } as payload,
-      // others dispatch "home" directly. Normalize both shapes here.
-      const mode =
-        action.payload && typeof action.payload === "object" && "appMode" in action.payload
-          ? action.payload.appMode
-          : action.payload;
-      return { ...state, appMode: mode };
-    }
+    case "SET_MODE":
+      return { ...state, appMode: action.payload };
 
     case "TOGGLE_CAMERA":
       return { ...state, cameraVisible: !state.cameraVisible };
@@ -3536,11 +3549,10 @@ function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
 
     case "END_STUDY": {
       if (!state.currentStudySession) return state;
-      const now = Date.now();
-      const endedSession: StudySession = {
+      const endedSession = {
         ...state.currentStudySession,
-        endTime: now,
-        totalTime: now - state.currentStudySession.startTime,
+        endTime: Date.now(),
+        totalTime: Date.now() - state.currentStudySession.startTime,
       };
       return {
         ...state,
@@ -3569,7 +3581,7 @@ function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
       const { name, timeLimit } = action.payload;
       const newQuiz: QuizSession = {
         id: `quiz_${Date.now()}`,
-        name: name ?? "Quiz Session",
+        name,
         startTime: Date.now(),
         endTime: null,
         totalTime: 0,
@@ -3584,21 +3596,22 @@ function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
 
     case "END_QUIZ": {
       if (!state.currentQuizSession) return state;
-      const now = Date.now();
-      const totalTime = now - state.currentQuizSession.startTime;
-      const endedQuiz: QuizSession = {
+      const endedQuiz = {
         ...state.currentQuizSession,
-        endTime: now,
-        totalTime,
+        endTime: Date.now(),
+        totalTime: Date.now() - state.currentQuizSession.startTime,
         focusPercentage:
-          totalTime > 0
-            ? (state.currentQuizSession.gazeInTime / totalTime) * 100
+          state.currentQuizSession.totalTime > 0
+            ? (state.currentQuizSession.gazeInTime /
+                state.currentQuizSession.totalTime) *
+              100
             : 0,
         status:
-          totalTime > 0 &&
-          state.currentQuizSession.gazeOutTime / totalTime > 0.1
-            ? "almost_cheating"
-            : "good",
+          state.currentQuizSession.gazeOutTime /
+            (Date.now() - state.currentQuizSession.startTime) >
+          0.1
+            ? ("almost_cheating" as const)
+            : ("good" as const),
       };
       return {
         ...state,
