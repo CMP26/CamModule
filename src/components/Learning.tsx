@@ -6,12 +6,12 @@
 // then dispatches to the reducer so logs show correct values.
 // ============================================================
 
-import { useState, useEffect, useRef } from "react";
-import { useSession } from "../context/SessionContext";
+import { useEffect, useRef, useState } from "react";
 import { useCameraContext } from "../context/CameraContext";
-import { useFaceMesh } from "../hooks/useFaceMesh";
+import { useSession } from "../context/SessionContext";
 import { useAttentionDetection } from "../hooks/useAttentionDetection";
 import { useBrowserMonitor } from "../hooks/useBrowserMonitor";
+import { useFaceMesh } from "../hooks/useFaceMesh";
 
 type LearningStep = "select" | "article" | "video";
 
@@ -43,7 +43,7 @@ export function Learning() {
       pauseAfterSeconds: 3,
       onPause: () => console.log("[Learning] Pausing video..."),
       onResume: () => console.log("[Learning] Resuming video..."),
-    }
+    },
   );
 
   // ========== BUG FIX 3: Accumulate presence time ==========
@@ -52,6 +52,7 @@ export function Learning() {
   const inactiveTimeRef = useRef(0);
   // Sync isAttentive into a ref for the interval
   const isAttentiveRef = useRef(true);
+  const videoPlayerRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     isAttentiveRef.current = isAttentive;
   }, [isAttentive]);
@@ -110,6 +111,26 @@ export function Learning() {
     };
   }, [dispatch]);
 
+  // useEffect(() => {
+  //   const video = videoPlayerRef.current;
+  //   if (!video) return;
+  //   if (isAttentive) {
+  //     video.play().catch(() => {});
+  //   } else {
+  //     video.pause();
+  //   }
+  // }, [isAttentive]);
+
+  useEffect(() => {
+    const iframe = document.getElementById("yt-player") as HTMLIFrameElement;
+    if (!iframe) return;
+    const command = isAttentive ? "playVideo" : "pauseVideo";
+    iframe.contentWindow?.postMessage(
+      JSON.stringify({ event: "command", func: command, args: [] }),
+      "*",
+    );
+  }, [isAttentive]);
+
   // ========== HELPERS ==========
   const handleBackToHome = () => {
     setAppMode("home");
@@ -155,14 +176,18 @@ export function Learning() {
               }}
               onMouseEnter={(e) => {
                 if (cameraReady)
-                  (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
+                  (e.currentTarget as HTMLDivElement).style.transform =
+                    "scale(1.05)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+                (e.currentTarget as HTMLDivElement).style.transform =
+                  "scale(1)";
               }}
             >
               <div style={{ fontSize: 48, marginBottom: 15 }}>📄</div>
-              <h2 style={{ margin: 0, marginBottom: 10, fontSize: 24 }}>Article</h2>
+              <h2 style={{ margin: 0, marginBottom: 10, fontSize: 24 }}>
+                Article
+              </h2>
               <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>
                 Read an article and stay focused
               </p>
@@ -190,14 +215,18 @@ export function Learning() {
               }}
               onMouseEnter={(e) => {
                 if (cameraReady)
-                  (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
+                  (e.currentTarget as HTMLDivElement).style.transform =
+                    "scale(1.05)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+                (e.currentTarget as HTMLDivElement).style.transform =
+                  "scale(1)";
               }}
             >
               <div style={{ fontSize: 48, marginBottom: 15 }}>🎬</div>
-              <h2 style={{ margin: 0, marginBottom: 10, fontSize: 24 }}>Video</h2>
+              <h2 style={{ margin: 0, marginBottom: 10, fontSize: 24 }}>
+                Video
+              </h2>
               <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>
                 Watch a video and pay attention
               </p>
@@ -234,15 +263,14 @@ export function Learning() {
   if (step === "article") {
     return (
       <div className="container">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <h1>📖 Reading Article</h1>
-          <button
-            className="secondary"
-            onClick={() => setStep("select")}
-            style={{ padding: "8px 16px" }}
-          >
-            ← Back
-          </button>
         </div>
 
         {/* ========== REAL-TIME STATUS ========== */}
@@ -323,29 +351,33 @@ export function Learning() {
               borderLeft: "4px solid #667eea",
             }}
           >
-            <h2 style={{ marginTop: 0, color: "#333" }}>Introduction to Machine Learning</h2>
+            <h2 style={{ marginTop: 0, color: "#333" }}>
+              Introduction to Machine Learning
+            </h2>
             <p>
-              Machine learning is a subset of artificial intelligence that focuses on the
-              development of computer systems that can learn and improve from experience
-              without being explicitly programmed. Instead of relying on step-by-step
-              programming instructions, machine learning algorithms use data and feedback
-              to recognize patterns and make decisions with minimal human intervention.
+              Machine learning is a subset of artificial intelligence that
+              focuses on the development of computer systems that can learn and
+              improve from experience without being explicitly programmed.
+              Instead of relying on step-by-step programming instructions,
+              machine learning algorithms use data and feedback to recognize
+              patterns and make decisions with minimal human intervention.
             </p>
             <h3 style={{ color: "#333", marginTop: 25 }}>Key Concepts</h3>
             <p>
-              There are three main types of machine learning: supervised learning,
-              unsupervised learning, and reinforcement learning. Supervised learning
-              involves training a model on labeled data, where each example is paired
-              with its correct answer. Unsupervised learning discovers hidden patterns
-              in unlabeled data, while reinforcement learning trains models to make
-              decisions through trial and error.
+              There are three main types of machine learning: supervised
+              learning, unsupervised learning, and reinforcement learning.
+              Supervised learning involves training a model on labeled data,
+              where each example is paired with its correct answer. Unsupervised
+              learning discovers hidden patterns in unlabeled data, while
+              reinforcement learning trains models to make decisions through
+              trial and error.
             </p>
             <p>
-              Applications of machine learning are everywhere in modern life. From
-              recommendation systems on streaming platforms to autonomous vehicles,
-              from medical diagnosis to natural language processing, machine learning
-              has become an essential technology that powers many of the applications
-              we use daily.
+              Applications of machine learning are everywhere in modern life.
+              From recommendation systems on streaming platforms to autonomous
+              vehicles, from medical diagnosis to natural language processing,
+              machine learning has become an essential technology that powers
+              many of the applications we use daily.
             </p>
           </div>
         </div>
@@ -378,7 +410,8 @@ export function Learning() {
               fontWeight: "bold",
             }}
           >
-            ⏱️ Continuing distraction for {secondsUntilPause} more seconds will end the session.
+            ⏱️ Continuing distraction for {secondsUntilPause} more seconds will
+            end the session.
           </div>
         )}
 
@@ -393,15 +426,14 @@ export function Learning() {
   if (step === "video") {
     return (
       <div className="container">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <h1>🎬 Watching Video</h1>
-          <button
-            className="secondary"
-            onClick={() => setStep("select")}
-            style={{ padding: "8px 16px" }}
-          >
-            ← Back
-          </button>
         </div>
 
         {/* ========== REAL-TIME STATUS ========== */}
@@ -471,25 +503,36 @@ export function Learning() {
         </div>
 
         {/* ========== VIDEO PLAYER ========== */}
-        <div className="video-container" style={{ marginBottom: 30 }}>
+        <div className="video-player-wrapper" style={{ marginBottom: 30 }}>
+          {/* OLD VIDEO ELEMENT — kept for reference, replaced by YouTube embed below */}
+          {/*
           <video
+            ref={videoPlayerRef}
             width="100%"
-            height="auto"
             controls
-            autoPlay={isAttentive}
-            style={{ borderRadius: 8 }}
+            height="auto"
+            style={{ display: "block", borderRadius: 8, minHeight: 200 }}
           >
             <source
-              src="https://media-files.vidyard.com/videos/BKp6fFnCXNw0p0V5CqPQkw/720p/download?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+              src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
               type="video/mp4"
             />
-            Your browser does not support the video tag.
-          </video>
-          {!isAttentive && (
+          </video> */}
+          <iframe
+            id="yt-player"
+            width="100%"
+            height="450"
+            src="https://www.youtube.com/embed/GUv-nBm8-ds?enablejsapi=1&autoplay=1"
+            title="Learning Video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{ display: "block", borderRadius: 8 }}
+          />
+          {/* {!isAttentive && (
             <div
               style={{
                 position: "absolute",
-                top: "50%",
+                top: "35%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 background: "rgba(0,0,0,0.7)",
@@ -499,9 +542,11 @@ export function Learning() {
                 textAlign: "center",
               }}
             >
-              ⏸️ Video Paused<br />Pay attention to continue
+              ⏸️ Video Paused
+              <br />
+              Pay attention to continue
             </div>
-          )}
+          )} */}
         </div>
 
         {/* ========== WARNINGS ========== */}
@@ -532,7 +577,8 @@ export function Learning() {
               fontWeight: "bold",
             }}
           >
-            ⏱️ Video will pause in {secondsUntilPause} seconds if you don't refocus.
+            ⏱️ Video will pause in {secondsUntilPause} seconds if you don't
+            refocus.
           </div>
         )}
 
