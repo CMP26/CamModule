@@ -292,7 +292,7 @@ export function Logs() {
                       )}
 
                       <div className="quiz-chart">
-                        <ResponsiveContainer width="100%" height={180}>
+                        <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
                             <Pie
                               data={pieData}
@@ -327,14 +327,6 @@ export function Logs() {
           )}
         </div>
       )}
-
-      <div className="logs-footer">
-        <p>Session ID: {state.sessionId.substring(0, 12)}...</p>
-        <p style={{ fontSize: "12px", color: "#999" }}>
-          Data is stored per browser tab and will be cleared when you close the
-          tab.
-        </p>
-      </div>
     </div>
   );
 }
