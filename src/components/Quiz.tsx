@@ -9,11 +9,11 @@
 // ============================================================
 
 import { useEffect, useRef, useState } from "react";
-import { useSession } from "../context/SessionContext";
 import { useCameraContext } from "../context/CameraContext";
-import { useFaceMesh } from "../hooks/useFaceMesh";
+import { useSession } from "../context/SessionContext";
 import { useBrowserMonitor } from "../hooks/useBrowserMonitor";
-
+import { useFaceMesh } from "../hooks/useFaceMesh";
+import "./Quiz.css";
 // Quiz questions and correct answers
 const QUESTIONS = [
   {
@@ -44,13 +44,15 @@ export function Quiz() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   // Grade result shown after submission
-  const [grade, setGrade] = useState<{ score: number; total: number } | null>(null);
+  const [grade, setGrade] = useState<{ score: number; total: number } | null>(
+    null,
+  );
 
   // ========== GAZE & FACE TRACKING ==========
   const { isLookingAway, faceCount } = useFaceMesh(
     useCameraContext().videoRef,
     cameraReady,
-    { gracePeriodMs: 300 }
+    { gracePeriodMs: 300 },
   );
 
   // ========== TAB MONITORING ==========
@@ -91,7 +93,7 @@ export function Quiz() {
     }, 1000);
 
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, state.currentQuizSession]);
 
   // ========== AUTO-START TIMER ON MOUNT ==========
@@ -143,7 +145,11 @@ export function Quiz() {
 
   // ========== EXIT WITHOUT SUBMITTING ==========
   const handleExitWithoutSubmit = () => {
-    if (confirm("Exit quiz without submitting? Your quiz will NOT be saved to logs.")) {
+    if (
+      confirm(
+        "Exit quiz without submitting? Your quiz will NOT be saved to logs.",
+      )
+    ) {
       submittedRef.current = false; // ensure discard path
       dispatch({ type: "DISCARD_QUIZ" } as any);
       quizStartedRef.current = false;
@@ -160,7 +166,7 @@ export function Quiz() {
     return (
       <div className="quiz-results">
         <div className="results-card">
-          <h1>🎉 Quiz Submitted!</h1>
+          <h1 style={{ margin: "0 0 25px 0" }}>🎉 Quiz Submitted!</h1>
 
           <div className="score-display">
             <div className="score-circle">
@@ -171,56 +177,67 @@ export function Quiz() {
 
           <div className="results-stats">
             <div className="stat">
-              <div style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>CORRECT</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: "#27ae60" }}>{grade.score}</div>
+              <div style={{ fontSize: 12, color: "#555", marginBottom: 5 }}>
+                CORRECT
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: "#333" }}>
+                {grade.score}
+              </div>
             </div>
             <div className="stat">
-              <div style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>TOTAL</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{grade.total}</div>
+              <div style={{ fontSize: 12, color: "#555", marginBottom: 5 }}>
+                TOTAL
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: "#333" }}>
+                {grade.total}
+              </div>
             </div>
             <div className="stat">
-              <div style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>WRONG</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: "#e74c3c" }}>
+              <div style={{ fontSize: 12, color: "#555", marginBottom: 5 }}>
+                WRONG
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: "#333" }}>
                 {grade.total - grade.score}
               </div>
             </div>
           </div>
 
+          <div className="results-divider" />
+
           <div
             className={`status-box ${isPassed ? "good" : "warning"}`}
-            style={{ textAlign: "center" }}
+            style={{ textAlign: "center", margin: "20px 0" }}
           >
-            {isPassed ? "✅ Passed! Great job!" : "⚠️ Below passing score. Keep studying!"}
+            {isPassed
+              ? "✅ Passed! Great job!"
+              : "⚠️ Below passing score. Keep studying!"}
           </div>
 
-          <p style={{ color: "#666", fontSize: 13, margin: "15px 0" }}>
+          <p
+            style={{
+              color: "#666",
+              fontSize: 12,
+              margin: "15px 0 25px 0",
+              textAlign: "center",
+            }}
+          >
             Your attention data has been saved to Analytics.
           </p>
 
-          <button
-            className="primary-btn"
-            onClick={() => setAppMode("home")}
-            style={{ width: "100%", marginTop: 10 }}
-          >
-            ← Back to Home
-          </button>
-
-          <button
-            className="secondary-btn"
-            onClick={() => setAppMode("logs")}
-            style={{
-              width: "100%",
-              marginTop: 10,
-              padding: "12px",
-              background: "#e0e0e0",
-              border: "none",
-              borderRadius: 8,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            📊 View Analytics
-          </button>
+          <div className="results-buttons">
+            <button
+              className="results-btn-home"
+              onClick={() => setAppMode("home")}
+            >
+              ← Back to Home
+            </button>
+            <button
+              className="results-btn-logs"
+              onClick={() => setAppMode("logs")}
+            >
+              📊 View Analytics
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -306,7 +323,7 @@ export function Quiz() {
           <div style={{ fontWeight: "bold" }}>
             {state.currentQuizSession
               ? `⏱ ${Math.round(
-                  (Date.now() - state.currentQuizSession.startTime) / 1000
+                  (Date.now() - state.currentQuizSession.startTime) / 1000,
                 )}s`
               : "0s"}
           </div>
@@ -415,10 +432,7 @@ export function Quiz() {
         </button>
 
         {/* BUG FIX 2: Only this button remains for exiting (no separate "Exit Quiz") */}
-        <button
-          className="secondary"
-          onClick={handleExitWithoutSubmit}
-        >
+        <button className="secondary" onClick={handleExitWithoutSubmit}>
           Exit Without Submitting
         </button>
       </div>
