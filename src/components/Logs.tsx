@@ -13,7 +13,6 @@ export function Logs() {
   const { state, setAppMode, clearLogs } = useSession();
   const { studySessions, quizSessions } = state.sessionLogs;
 
-  // Calculate overall study metrics
   const totalStudyTime = studySessions.reduce((sum, s) => sum + s.totalTime, 0);
   const totalActiveTime = studySessions.reduce(
     (sum, s) => sum + s.activePresenceTime,
@@ -40,11 +39,11 @@ export function Logs() {
   };
 
   const getFocusColor = (percentage: number) => {
-    if (percentage < 50) return "#e74c3c"; // red
-    if (percentage < 65) return "#e67e22"; // orange
-    if (percentage < 75) return "#f39c12"; // yellow
-    if (percentage < 85) return "#a9d961"; // light green
-    return "#27ae60"; // dark green
+    if (percentage < 50) return "#e74c3c"; 
+    if (percentage < 65) return "#e67e22"; 
+    if (percentage < 75) return "#f39c12"; 
+    if (percentage < 85) return "#a9d961";
+    return "#27ae60";
   };
 
   const getFocusLabel = (percentage: number) => {
@@ -105,7 +104,6 @@ export function Logs() {
         </div>
       ) : (
         <div className="logs-content">
-          {/* Overall Study Focus Section */}
           {studySessions.length > 0 && (
             <section className="logs-section">
               <h2>📚 Overall Study Focus</h2>
@@ -212,7 +210,6 @@ export function Logs() {
             </section>
           )}
 
-          {/* Exam Logs Section */}
           {quizSessions.length > 0 && (
             <section className="logs-section">
               <h2>✏️ Exam Logs</h2>

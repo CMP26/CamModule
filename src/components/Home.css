@@ -33,9 +33,13 @@
 
 .home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr); 
   gap: 25px;
   margin-bottom: 40px;
+}
+
+.home-grid > :nth-child(4) {
+  grid-column: 2; 
 }
 
 .home-card {
@@ -60,8 +64,8 @@
 .home-card.info-card {
   background: linear-gradient(
     135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.1) 100%
+    rgba(181, 192, 241, 0.1) 0%,
+    rgba(143, 123, 162, 0.1) 100%
   );
   cursor: default;
 }

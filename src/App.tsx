@@ -1,9 +1,3 @@
-// ============================================================
-// App.tsx — FINAL FIXED VERSION
-// - Video element HIDDEN (only for MediaPipe processing)
-// - FloatingCamera is the ONLY visible camera display
-// ============================================================
-
 import "./App.css";
 import { Home } from "./components/Home";
 import { Learning } from "./components/Learning";
@@ -18,9 +12,6 @@ function AppContent() {
 
   return (
     <div className="app-wrapper">
-      {/* ========== HIDDEN VIDEO ELEMENT ========== */}
-      {/* This video is HIDDEN - only used for MediaPipe processing */}
-      {/* The FloatingCamera window is the ONLY visible camera display */}
       <video
         ref={videoRef}
         crossOrigin="anonymous"
@@ -28,7 +19,7 @@ function AppContent() {
         muted
         playsInline
         style={{
-          display: 'none', // ← HIDDEN (was 'block' before)
+          display: 'none',
         }}
         data-testid="shared-video-element"
       />
@@ -38,7 +29,6 @@ function AppContent() {
         data-testid="shared-canvas-element"
       />
 
-      {/* ========== DEBUG INFO (TOP-LEFT) ========== */}
       {error && (
         <div
           style={{
@@ -91,7 +81,6 @@ function AppContent() {
         </div>
       )}
 
-      {/* ========== MAIN CONTENT ========== */}
       {state.appMode === "home" && <Home />}
       {state.appMode === "learning" && <Learning />}
       {state.appMode === "quiz" && <Quiz />}

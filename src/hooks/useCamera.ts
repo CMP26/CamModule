@@ -1,7 +1,3 @@
-// ============================================================
-// Task 1.1 — useCamera
-// Initializes and manages the user's webcam stream safely.
-// ============================================================
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { UseCameraOptions } from "../types";
 
@@ -54,7 +50,6 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
     }
   }, [width, height, facingMode]);
 
-  // Start on mount, clean up on unmount
   useEffect(() => {
     startCamera();
     return () => stopCamera();

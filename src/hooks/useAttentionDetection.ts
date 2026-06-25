@@ -1,15 +1,9 @@
-// ============================================================
-// Task 2.1 — Presence Verification   (face in frame)
-// Task 2.2 — Focus Duration Timer    (3-second countdown)
-// Task 2.3 — Video State Automation  (onPause / onResume)
-// Task 2.4 — Log Aggregator          (focus loss JSON log)
-// ============================================================
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { FocusLogEntry, UseAttentionOptions } from "../types";
 
 export interface UseAttentionDetectionReturn {
   isAttentive: boolean;
-  secondsUntilPause: number | null; // countdown shown to user, null when attentive
+  secondsUntilPause: number | null; 
   focusLog: FocusLogEntry[];
   clearLog: () => void;
 }
@@ -30,7 +24,6 @@ export function useAttentionDetection(
   const [secondsUntilPause, setSecondsUntilPause] = useState<number | null>(null);
   const [focusLog, setFocusLog] = useState<FocusLogEntry[]>([]);
 
-  // Refs for timers so they don't get stale in closures
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const focusLostAtRef = useRef<number | null>(null);
   const isAttentiveRef = useRef(true);
@@ -46,7 +39,7 @@ export function useAttentionDetection(
   }, []);
 
   const startCountdown = useCallback(() => {
-    if (countdownRef.current !== null) return; // already running
+    if (countdownRef.current !== null) return; 
     focusLostAtRef.current = Date.now();
     let remaining = pauseAfterSeconds;
     setSecondsUntilPause(remaining);
@@ -77,7 +70,6 @@ export function useAttentionDetection(
     setSecondsUntilPause(null);
   }, []);
 
-  // Determine the dominant reason for distraction
   const getDistractType = (): FocusLogEntry["type"] => {
     if (isTabSwitched) return "tab_switch";
     if (faceCount === 0) return "no_face";
@@ -85,14 +77,12 @@ export function useAttentionDetection(
     return "gaze_away";
   };
 
-  // Master attention logic
   const isDistracted = isLookingAway || isTabSwitched || faceCount === 0;
 
   useEffect(() => {
     if (isDistracted) {
       startCountdown();
     } else {
-      // Student is back — recover
       stopCountdown();
 
       if (!isAttentiveRef.current) {
@@ -108,15 +98,12 @@ export function useAttentionDetection(
         onResume?.();
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDistracted]);
 
-  // Log when a new distraction starts (after pause fires)
   useEffect(() => {
     if (!isAttentive && isDistracted) {
       appendLog(getDistractType());
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAttentive]);
 
   const clearLog = useCallback(() => setFocusLog([]), []);

@@ -1,7 +1,3 @@
-// ============================================================
-// Task 1.5 — useBrowserMonitor
-// Tracks tab switching (visibilitychange) and window focus loss.
-// ============================================================
 import { useEffect, useState, useCallback } from "react";
 
 export interface UseBrowserMonitorReturn {
@@ -31,7 +27,6 @@ export function useBrowserMonitor(): UseBrowserMonitorReturn {
   }, []);
 
   const handleFocus = useCallback(() => {
-    // Only reset if the tab is also visible (not just focus returning)
     if (!document.hidden) {
       setIsTabSwitched(false);
     }

@@ -40,7 +40,6 @@ export function Home() {
             <ul>
               <li>📷 Your camera monitors your presence</li>
               <li>👁️ Gaze tracking ensures focus</li>
-              <li>📊 All metrics saved per session</li>
               <li>⚡ Real-time feedback & reminders</li>
             </ul>
           </div>

@@ -361,19 +361,6 @@
   border-radius: 8px;
 }
 
-.logs-footer {
-  background: #f0f0f0;
-  padding: 20px 30px;
-  text-align: center;
-  border-top: 1px solid #e0e0e0;
-  color: #666;
-  font-size: 12px;
-}
-
-.logs-footer p {
-  margin: 5px 0;
-}
-
 @media (max-width: 768px) {
   .logs-header {
     flex-direction: column;

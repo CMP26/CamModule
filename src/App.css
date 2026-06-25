@@ -1,16 +1,9 @@
-/* ============================================================
-   App.css — FINAL VERSION WITH CENTERING FIX
-   =========================================================== */
-
-/* ========== APP WRAPPER ========== */
 .app-wrapper {
   width: 100%;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* ========== CONTAINER (CENTERED) ========== */
-/* ✅ FIX: Proper centering for Quiz/Learning/Home content */
 .container {
   max-width: 900px;
   margin: 0 auto !important;
@@ -19,10 +12,9 @@
   background: white;
   border-radius: 12px;
 
-  /* Add these lines to center children */
   display: flex;
   flex-direction: column;
-  align-items: center; /* This centers items horizontally */
+  align-items: center; 
   justify-content: center;
 }
 
@@ -50,7 +42,6 @@
   font-size: 14px;
 }
 
-/* ========== BUTTONS ========== */
 .button-group {
   display: flex;
   gap: 15px;
@@ -106,7 +97,6 @@
   transform: translateY(0);
 }
 
-/* ========== STATUS CARDS ========== */
 .status-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -153,7 +143,6 @@
   font-weight: bold;
 }
 
-/* ========== VIDEO CONTAINER ========== */
 .video-container {
   position: relative;
   background: #000;
@@ -171,7 +160,6 @@
   text-align: center;
 }
 
-/* ========== LOG CONTAINER ========== */
 .log-container {
   background: #f9f9f9;
   padding: 20px;
@@ -215,7 +203,6 @@
   border-left-color: #f44336;
 }
 
-/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .container {
     padding: 20px 15px;

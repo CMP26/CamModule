@@ -1,11 +1,3 @@
-// ============================================================
-// Learning.tsx — FIXED VERSION
-// Bug fix: Active/Inactive presence time was always 0 in logs because
-// UPDATE_STUDY_PRESENCE was never dispatched. Now an interval ticks
-// every second and accumulates time based on isLookingAway/faceCount/isTabSwitched,
-// then dispatches to the reducer so logs show correct values.
-// ============================================================
-
 import { useEffect, useRef, useState } from "react";
 import { useCameraContext } from "../context/CameraContext";
 import { useSession } from "../context/SessionContext";
@@ -18,21 +10,12 @@ type LearningStep = "select" | "article" | "video";
 export function Learning() {
   const { dispatch, setAppMode } = useSession();
   const { videoRef, cameraReady } = useCameraContext();
-
   const [step, setStep] = useState<LearningStep>("select");
-
-  // Use a ref to track session active state — avoids stale closure in cleanup
   const sessionActiveRef = useRef(false);
-
-  // ========== GAZE & FACE TRACKING ==========
   const { isLookingAway, faceCount } = useFaceMesh(videoRef, cameraReady, {
     gracePeriodMs: 500,
   });
-
-  // ========== TAB MONITORING ==========
   const { isTabSwitched } = useBrowserMonitor();
-
-  // ========== ATTENTION DETECTION ==========
   const { isAttentive, secondsUntilPause } = useAttentionDetection(
     {
       isLookingAway,
@@ -46,18 +29,13 @@ export function Learning() {
     },
   );
 
-  // ========== BUG FIX 3: Accumulate presence time ==========
-  // We keep refs for the running totals so the interval closure is never stale.
   const activeTimeRef = useRef(0);
   const inactiveTimeRef = useRef(0);
-  // Sync isAttentive into a ref for the interval
   const isAttentiveRef = useRef(true);
-  const videoPlayerRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     isAttentiveRef.current = isAttentive;
   }, [isAttentive]);
 
-  // Tick every second while a study session is active, accumulate and dispatch
   useEffect(() => {
     const interval = setInterval(() => {
       if (!sessionActiveRef.current) return;
@@ -80,11 +58,9 @@ export function Learning() {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  // ========== START / STOP SESSION BASED ON STEP ==========
   useEffect(() => {
     if (step !== "select") {
       if (!sessionActiveRef.current) {
-        // Reset accumulators for the new session
         activeTimeRef.current = 0;
         inactiveTimeRef.current = 0;
         dispatch({ type: "START_STUDY" });
@@ -100,7 +76,6 @@ export function Learning() {
     }
   }, [step, dispatch]);
 
-  // ========== CLEANUP ON UNMOUNT ==========
   useEffect(() => {
     return () => {
       if (sessionActiveRef.current) {
@@ -110,16 +85,6 @@ export function Learning() {
       }
     };
   }, [dispatch]);
-
-  // useEffect(() => {
-  //   const video = videoPlayerRef.current;
-  //   if (!video) return;
-  //   if (isAttentive) {
-  //     video.play().catch(() => {});
-  //   } else {
-  //     video.pause();
-  //   }
-  // }, [isAttentive]);
 
   useEffect(() => {
     const iframe = document.getElementById("yt-player") as HTMLIFrameElement;
@@ -131,14 +96,11 @@ export function Learning() {
     );
   }, [isAttentive]);
 
-  // ========== HELPERS ==========
   const handleBackToHome = () => {
     setAppMode("home");
   };
 
-  // ========== RENDER STEPS ==========
 
-  // STEP 1: SELECT ARTICLE OR VIDEO
   if (step === "select") {
     return (
       <div className="container">
@@ -154,7 +116,6 @@ export function Learning() {
               maxWidth: 600,
             }}
           >
-            {/* ARTICLE OPTION */}
             <div
               onClick={() => {
                 if (!cameraReady) {
@@ -193,7 +154,6 @@ export function Learning() {
               </p>
             </div>
 
-            {/* VIDEO OPTION */}
             <div
               onClick={() => {
                 if (!cameraReady) {
@@ -259,7 +219,6 @@ export function Learning() {
     );
   }
 
-  // STEP 2: READING ARTICLE
   if (step === "article") {
     return (
       <div className="container">
@@ -273,7 +232,6 @@ export function Learning() {
           <h1>📖 Reading Article</h1>
         </div>
 
-        {/* ========== REAL-TIME STATUS ========== */}
         <div
           style={{
             display: "grid",
@@ -339,7 +297,6 @@ export function Learning() {
           </div>
         </div>
 
-        {/* ========== ARTICLE CONTENT ========== */}
         <div style={{ marginBottom: 30 }}>
           <div
             style={{
@@ -382,7 +339,6 @@ export function Learning() {
           </div>
         </div>
 
-        {/* ========== WARNINGS ========== */}
         {(isLookingAway || faceCount === 0 || isTabSwitched) && (
           <div
             style={{
@@ -422,7 +378,6 @@ export function Learning() {
     );
   }
 
-  // STEP 3: WATCHING VIDEO
   if (step === "video") {
     return (
       <div className="container">
@@ -436,7 +391,6 @@ export function Learning() {
           <h1>🎬 Watching Video</h1>
         </div>
 
-        {/* ========== REAL-TIME STATUS ========== */}
         <div
           style={{
             display: "grid",
@@ -502,22 +456,8 @@ export function Learning() {
           </div>
         </div>
 
-        {/* ========== VIDEO PLAYER ========== */}
         <div className="video-player-wrapper" style={{ marginBottom: 30 }}>
-          {/* OLD VIDEO ELEMENT — kept for reference, replaced by YouTube embed below */}
-          {/*
-          <video
-            ref={videoPlayerRef}
-            width="100%"
-            controls
-            height="auto"
-            style={{ display: "block", borderRadius: 8, minHeight: 200 }}
-          >
-            <source
-              src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-              type="video/mp4"
-            />
-          </video> */}
+          
           <iframe
             id="yt-player"
             width="100%"
@@ -528,28 +468,9 @@ export function Learning() {
             allowFullScreen
             style={{ display: "block", borderRadius: 8 }}
           />
-          {/* {!isAttentive && (
-            <div
-              style={{
-                position: "absolute",
-                top: "35%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                background: "rgba(0,0,0,0.7)",
-                color: "white",
-                padding: "20px",
-                borderRadius: 8,
-                textAlign: "center",
-              }}
-            >
-              ⏸️ Video Paused
-              <br />
-              Pay attention to continue
-            </div>
-          )} */}
+          
         </div>
 
-        {/* ========== WARNINGS ========== */}
         {(isLookingAway || faceCount === 0 || isTabSwitched) && (
           <div
             style={{

@@ -1,8 +1,3 @@
-// ============================================================
-// Task 1.3 — useGazeTracking  (gaze + head angle detection)
-// Task 1.4 — Multi-person detection (faceCount)
-// Both are powered by one shared MediaPipe inference loop.
-// ============================================================
 import {
   useCallback,
   useEffect,
@@ -11,12 +6,7 @@ import {
   type RefObject,
 } from "react";
 import type { UseGazeOptions } from "../types";
-import {
-  // computeGazeRatio,
-  // computeHeadPitch,
-  // computeHeadYaw,
-  isGazingAway,
-} from "../utils/gazeUtils";
+import { isGazingAway } from "../utils/gazeUtils";
 import { getFaceMesh, type Results } from "../utils/mediapipeLoader";
 
 export interface UseFaceMeshReturn {
@@ -36,7 +26,6 @@ export function useFaceMesh(
   const [faceCount, setFaceCount] = useState(0);
   const [modelReady, setModelReady] = useState(false);
 
-  // Internal refs to avoid stale closures in the RAF loop
   const rafRef = useRef<number | null>(null);
   const awayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCurrentlyAwayRef = useRef(false);
@@ -55,7 +44,6 @@ export function useFaceMesh(
         return;
       }
 
-      // Send current video frame to MediaPipe
       await faceMesh.send({ image: videoRef.current });
 
       rafRef.current = requestAnimationFrame(() => runLoop(faceMesh));
@@ -72,53 +60,6 @@ export function useFaceMesh(
       const faceMesh = await getFaceMesh();
       if (cancelled) return;
 
-      // Register result handler
-      // faceMesh.onResults((results: Results) => {
-      //   if (cancelled) return;
-
-      //   const faces = results.multiFaceLandmarks ?? [];
-      //   setFaceCount(faces.length);
-
-      //   if (faces.length === 0) {
-      //     // No face – start a timer if not already pending
-      //     if (!isCurrentlyAwayRef.current && awayTimerRef.current === null) {
-      //       awayTimerRef.current = setTimeout(() => {
-      //         isCurrentlyAwayRef.current = true;
-      //         setIsLookingAway(true);
-      //         awayTimerRef.current = null;
-      //       }, gracePeriodMs);
-      //     }
-      //     return;
-      //   }
-
-      //   const primaryLandmarks = faces[0];
-      //   const gazingAway = isGazingAway(primaryLandmarks);
-      //   // ... inside onResults
-      //   const { leftGaze, rightGaze } = computeGazeRatio(primaryLandmarks);
-      //   const yaw = computeHeadYaw(primaryLandmarks);
-      //   const pitch = computeHeadPitch(primaryLandmarks);
-      //   console.log(
-      //     `Gaze: L=${leftGaze.toFixed(2)}, R=${rightGaze.toFixed(2)}, Yaw=${yaw.toFixed(1)}°, Pitch=${pitch.toFixed(1)}°`,
-      //   );
-
-      //   if (gazingAway) {
-      //     // Start timer only if none is running and not already away
-      //     if (!isCurrentlyAwayRef.current && awayTimerRef.current === null) {
-      //       awayTimerRef.current = setTimeout(() => {
-      //         isCurrentlyAwayRef.current = true;
-      //         setIsLookingAway(true);
-      //         awayTimerRef.current = null;
-      //       }, gracePeriodMs);
-      //     }
-      //   } else {
-      //     // Looking back – cancel timer and reset state
-      //     clearAwayTimer();
-      //     if (isCurrentlyAwayRef.current) {
-      //       isCurrentlyAwayRef.current = false;
-      //       setIsLookingAway(false);
-      //     }
-      //   }
-      // });
       faceMesh.onResults((results: Results) => {
         if (cancelled) return;
 
@@ -126,7 +67,6 @@ export function useFaceMesh(
         setFaceCount(faces.length);
 
         if (faces.length === 0) {
-          // No face – start timer if not already pending
           if (!isCurrentlyAwayRef.current && awayTimerRef.current === null) {
             awayTimerRef.current = setTimeout(() => {
               isCurrentlyAwayRef.current = true;
@@ -137,35 +77,27 @@ export function useFaceMesh(
           return;
         }
 
-        // Use first face for gaze (primary student)
         const primaryLandmarks = faces[0];
 
-        // --- Distance scaling ---
-        // Indices: LEFT_EYE_OUTER = 226, RIGHT_EYE_OUTER = 446
         const leftEye = primaryLandmarks[226];
         const rightEye = primaryLandmarks[446];
         const faceWidth = Math.abs(rightEye.x - leftEye.x);
 
-        // Baseline width at typical webcam distance (~50cm).
-        // Adjust this value based on your tests – if it's too sensitive/far, change 0.20.
         const REFERENCE_WIDTH = 0.2;
-        const MIN_SCALE = 0.6; // don't go below 0.6 (too sensitive)
-        const MAX_SCALE = 1.8; // don't go above 1.8 (too insensitive)
+        const MIN_SCALE = 0.6;
+        const MAX_SCALE = 1.8;
 
         let scale = REFERENCE_WIDTH / faceWidth;
         scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
 
-        // Base thresholds (tune these to your liking)
         const baseGazeThreshold = 0.15;
         const baseYawThreshold = 10;
         const basePitchThreshold = 10;
 
-        // Apply scaling
         const gazeThreshold = baseGazeThreshold * scale;
         const yawThreshold = baseYawThreshold * scale;
         const pitchThreshold = basePitchThreshold * scale;
 
-        // Now check if the user is looking away with dynamic thresholds
         const gazingAway = isGazingAway(
           primaryLandmarks,
           gazeThreshold,
@@ -175,7 +107,6 @@ export function useFaceMesh(
         console.log(
           `Face width: ${faceWidth.toFixed(3)}, Scale: ${scale.toFixed(2)}`,
         );
-        // --- Timer logic (same as before) ---
         if (gazingAway) {
           if (!isCurrentlyAwayRef.current && awayTimerRef.current === null) {
             awayTimerRef.current = setTimeout(() => {

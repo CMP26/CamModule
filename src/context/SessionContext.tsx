@@ -6,7 +6,6 @@ import React, {
   useReducer,
   type ReactNode,
 } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
 import type {
   GlobalAction,
   GlobalState,
@@ -28,18 +27,37 @@ const INITIAL_STATE: GlobalState = {
   currentStudySession: null,
   currentQuizSession: null,
 };
+const LOGS_STORAGE_KEY = "nexalearn_logs";
 
 function generateSessionId(): string {
   return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
+function initGlobalState(sessionId: string): GlobalState {
+  let sessionLogs: SessionLogs = {
+    ...INITIAL_STATE.sessionLogs,
+    sessionId,
+  };
+
+  if (typeof window !== "undefined") {
+    try {
+      const raw = window.localStorage.getItem(LOGS_STORAGE_KEY);
+      if (raw) sessionLogs = JSON.parse(raw);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  return { ...INITIAL_STATE, sessionId, sessionLogs };
+}
+
 function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
   switch (action.type) {
     case "SET_MODE": {
-      // BUG FIX: Some components dispatch { appMode: "home" } as payload,
-      // others dispatch "home" directly. Normalize both shapes here.
       const mode =
-        action.payload && typeof action.payload === "object" && "appMode" in action.payload
+        action.payload &&
+        typeof action.payload === "object" &&
+        "appMode" in action.payload
           ? action.payload.appMode
           : action.payload;
       return { ...state, appMode: mode };
@@ -66,7 +84,9 @@ function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
       const endedSession: StudySession = {
         ...state.currentStudySession,
         endTime: now,
-        totalTime: now - state.currentStudySession.startTime,
+        totalTime:
+          state.currentStudySession.activePresenceTime +
+          state.currentStudySession.inactiveTime,
       };
       return {
         ...state,
@@ -149,8 +169,29 @@ function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
       };
     }
 
-    case "LOAD_LOGS":
-      return { ...state, sessionLogs: action.payload };
+    case "LOAD_LOGS": {
+      const incoming: SessionLogs = action.payload;
+      const mergedStudy = [
+        ...state.sessionLogs.studySessions,
+        ...incoming.studySessions.filter(
+          (s) => !state.sessionLogs.studySessions.some((e) => e.id === s.id),
+        ),
+      ];
+      const mergedQuiz = [
+        ...state.sessionLogs.quizSessions,
+        ...incoming.quizSessions.filter(
+          (q) => !state.sessionLogs.quizSessions.some((e) => e.id === q.id),
+        ),
+      ];
+      return {
+        ...state,
+        sessionLogs: {
+          ...state.sessionLogs,
+          studySessions: mergedStudy,
+          quizSessions: mergedQuiz,
+        },
+      };
+    }
 
     case "CLEAR_LOGS":
       return {
@@ -186,32 +227,39 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const sessionId = useMemo(() => generateSessionId(), []);
-  const [state, dispatch] = useReducer(globalReducer, {
-    ...INITIAL_STATE,
+  const [state, dispatch] = useReducer(
+    globalReducer,
     sessionId,
-    sessionLogs: {
-      ...INITIAL_STATE.sessionLogs,
-      sessionId,
-    },
-  });
-
-  // Load logs from localStorage
-  const [savedLogs, setSavedLogs] = useLocalStorage<SessionLogs>(
-    `logs_${sessionId}`,
-    state.sessionLogs,
+    initGlobalState,
   );
 
   React.useEffect(() => {
-    // Load saved logs on mount
-    if (savedLogs && savedLogs.studySessions.length > 0) {
-      dispatch({ type: "LOAD_LOGS", payload: savedLogs });
+    try {
+      window.localStorage.setItem(
+        LOGS_STORAGE_KEY,
+        JSON.stringify(state.sessionLogs),
+      );
+    } catch (e) {
+      console.log(e);
     }
-  }, []);
+  }, [state.sessionLogs]);
 
-  // Save logs to localStorage whenever they change
   React.useEffect(() => {
-    setSavedLogs(state.sessionLogs);
-  }, [state.sessionLogs, setSavedLogs]);
+    function handleStorage(e: StorageEvent) {
+      if (e.key !== LOGS_STORAGE_KEY) return;
+      if (e.newValue === null) {
+        dispatch({ type: "CLEAR_LOGS" });
+        return;
+      }
+      try {
+        dispatch({ type: "LOAD_LOGS", payload: JSON.parse(e.newValue) });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const setAppMode = useCallback(
     (mode: "home" | "learning" | "quiz" | "logs") => {
@@ -262,6 +310,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const clearLogs = useCallback(() => {
     dispatch({ type: "CLEAR_LOGS" });
+    try {
+      window.localStorage.removeItem(LOGS_STORAGE_KEY);
+    } catch (e) {
+      console.log(e);
+    }
   }, []);
 
   const value: SessionContextType = {

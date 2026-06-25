@@ -1,11 +1,3 @@
-// ============================================================
-// CameraContext.tsx — FIXED VERSION
-// - Fixed TypeScript errors on addEventListener (null checks)
-// - Better error handling
-// - Proper video playback setup
-// - Retry logic
-// ============================================================
-
 import React, {
   createContext,
   useContext,
@@ -56,7 +48,6 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
     try {
       console.log("[CameraContext] Requesting camera access...");
 
-      // Request camera
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
@@ -78,26 +69,21 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
         return;
       }
 
-      // Set the stream
       video.srcObject = stream;
 
-      // Wait for video to load metadata
       return new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => {
           reject(new Error("Video metadata load timeout"));
-        }, 10000); // 10 second timeout
-
+        }, 10000); 
         const onLoadedMetadata = () => {
           clearTimeout(timeout);
           console.log(
             "[CameraContext] Video metadata loaded, video ready to play"
           );
 
-          // Use the captured `video` variable (guaranteed non-null) instead of videoRef.current
           video.removeEventListener("loadedmetadata", onLoadedMetadata);
           video.removeEventListener("error", onError);
 
-          // Try to play
           const playPromise = video.play();
 
           if (playPromise !== undefined) {
@@ -115,7 +101,6 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
                 reject(err);
               });
           } else {
-            // Older browsers without promise-based play()
             console.log("[CameraContext] Using non-promise play()");
             setCameraReady(true);
             resolve();
@@ -137,8 +122,6 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
           reject(new Error(errorMsg));
         };
 
-        // BUG FIX: Use captured `video` variable (non-null) instead of videoRef.current
-        // This eliminates the TypeScript "possibly null" red underlines
         video.addEventListener("loadedmetadata", onLoadedMetadata);
         video.addEventListener("error", onError);
       });
@@ -152,20 +135,17 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
       setError(msg);
       setCameraReady(false);
 
-      // Try to clean up
       streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
   }, []);
 
-  // Start camera on mount
   useEffect(() => {
     console.log("[CameraContext] Mounting, starting camera...");
     startCamera().catch((err) => {
       console.error("[CameraContext] Start failed:", err);
     });
 
-    // Cleanup on unmount
     return () => {
       console.log("[CameraContext] Unmounting, stopping camera...");
       stopCamera();

@@ -1,13 +1,6 @@
-// ============================================================
-// Task 1.2 — useIdentityVerification
-// Compares a reference photo to live webcam frames using
-// face-api.js 128-D face descriptors.
-// ============================================================
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { UseIdentityOptions } from "../types";
 
-// face-api.js is loaded from CDN to keep bundle light.
-// We cast to any for the dynamic import shape.
 type FaceApi = any;
 
 let faceApiPromise: Promise<FaceApi> | null = null;
@@ -31,7 +24,7 @@ async function loadFaceApi(): Promise<FaceApi> {
 }
 
 export interface UseIdentityVerificationReturn {
-  identityVerified: boolean | null; // null = not checked yet
+  identityVerified: boolean | null; 
   verifying: boolean;
   verifyNow: () => Promise<void>;
   modelsReady: boolean;
@@ -56,7 +49,6 @@ export function useIdentityVerification(
   const faceApiRef = useRef<FaceApi | null>(null);
   const referenceDescriptorRef = useRef<Float32Array | null>(null);
 
-  // Load models on mount
   useEffect(() => {
     loadFaceApi()
       .then((fa) => {
@@ -66,7 +58,6 @@ export function useIdentityVerification(
       .catch((e) => setError(String(e)));
   }, []);
 
-  // Pre-compute reference descriptor whenever referenceImageUrl changes
   useEffect(() => {
     if (!modelsReady || !referenceImageUrl) return;
     const faceapi = faceApiRef.current!;
@@ -122,7 +113,6 @@ export function useIdentityVerification(
         liveDetection.descriptor,
       );
 
-      // distance < threshold means faces are similar enough
       setIdentityVerified(distance < threshold);
     } catch (e) {
       setError("Verification error: " + String(e));

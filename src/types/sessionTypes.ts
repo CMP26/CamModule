@@ -1,17 +1,12 @@
-// ============================================================
-// Session & Analytics Types
-// ============================================================
-
 export type AppMode = "home" | "learning" | "quiz" | "logs";
 export type LearningType = "article" | "video";
-
 export interface StudySession {
   id: string;
   startTime: number;
   endTime: number | null;
-  totalTime: number; // ms
-  activePresenceTime: number; // ms when face detected
-  inactiveTime: number; // ms when no face detected
+  totalTime: number; 
+  activePresenceTime: number; 
+  inactiveTime: number; 
 }
 
 export interface QuizSession {
@@ -19,16 +14,16 @@ export interface QuizSession {
   name: string;
   startTime: number;
   endTime: number | null;
-  totalTime: number; // ms
-  gazeInTime: number; // ms looking at screen
-  gazeOutTime: number; // ms looking away
-  timeLimit?: number; // ms, optional
+  totalTime: number;
+  gazeInTime: number; 
+  gazeOutTime: number; 
+  timeLimit?: number;
   focusPercentage: number;
   status: "good" | "almost_cheating";
 }
 
 export interface SessionLogs {
-  sessionId: string; // unique per tab
+  sessionId: string;
   studySessions: StudySession[];
   quizSessions: QuizSession[];
   createdAt: number;

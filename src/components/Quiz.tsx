@@ -1,20 +1,9 @@
-// ============================================================
-// Quiz.tsx — FIXED VERSION
-// Bug fixes:
-// 1. Submit button now works: saves grade to logs, shows grade result, navigates home
-// 2. "Exit Quiz" top button removed (only two buttons: Submit and Exit Without Submitting)
-// 3. Exit Without Submitting does NOT save to logs (uses DISCARD_QUIZ)
-// 4. Gaze tracking accumulated every second and dispatched via UPDATE_QUIZ_GAZE
-//    so the focus % in logs is accurate instead of always 0
-// ============================================================
-
 import { useEffect, useRef, useState } from "react";
 import { useCameraContext } from "../context/CameraContext";
 import { useSession } from "../context/SessionContext";
 import { useBrowserMonitor } from "../hooks/useBrowserMonitor";
 import { useFaceMesh } from "../hooks/useFaceMesh";
 import "./Quiz.css";
-// Quiz questions and correct answers
 const QUESTIONS = [
   {
     question: "Question 1: What is the capital of France?",
@@ -34,47 +23,35 @@ export function Quiz() {
   const { state, dispatch, setAppMode } = useSession();
   const { cameraReady } = useCameraContext();
 
-  // Track whether the quiz session has been started (to guard against double-start)
   const quizStartedRef = useRef(false);
 
-  // Track whether quiz was submitted (to prevent saving logs on discard)
   const submittedRef = useRef(false);
 
-  // Answers state: { q1: "b", q2: "a" } etc.
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
-  // Grade result shown after submission
   const [grade, setGrade] = useState<{ score: number; total: number } | null>(
     null,
   );
 
-  // ========== GAZE & FACE TRACKING ==========
   const { isLookingAway, faceCount } = useFaceMesh(
     useCameraContext().videoRef,
     cameraReady,
     { gracePeriodMs: 300 },
   );
 
-  // ========== TAB MONITORING ==========
   const { isTabSwitched } = useBrowserMonitor();
 
-  // ========== BUG FIX 3: Accumulate gaze time and dispatch every second ==========
-  // We track gazeInTime and gazeOutTime locally with refs so we don't get
-  // stale closures inside the interval callback.
   const gazeInRef = useRef(0);
   const gazeOutRef = useRef(0);
   const isAttentiveRef = useRef(true);
 
-  // Keep attentive ref in sync with live values
   const isDistracted = isLookingAway || isTabSwitched || faceCount === 0;
   useEffect(() => {
     isAttentiveRef.current = !isDistracted;
   }, [isDistracted]);
 
-  // Tick every second, accumulate gaze time, and push to the reducer
   useEffect(() => {
     const interval = setInterval(() => {
-      // Only accumulate when quiz session is active
       if (!state.currentQuizSession) return;
 
       if (isAttentiveRef.current) {
@@ -93,10 +70,8 @@ export function Quiz() {
     }, 1000);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, state.currentQuizSession]);
 
-  // ========== AUTO-START TIMER ON MOUNT ==========
   useEffect(() => {
     if (!quizStartedRef.current && cameraReady) {
       dispatch({
@@ -110,55 +85,43 @@ export function Quiz() {
     }
   }, [cameraReady, dispatch]);
 
-  // ========== CLEANUP ON UNMOUNT ==========
-  // If the component unmounts without the user explicitly submitting or
-  // discarding, treat it as a discard (no log saved).
   useEffect(() => {
     return () => {
       if (quizStartedRef.current && !submittedRef.current) {
-        // Discard: remove from currentQuizSession without saving to logs
         dispatch({ type: "DISCARD_QUIZ" } as any);
         console.log("[Quiz] Session discarded (unmount without submit)");
       }
     };
   }, [dispatch]);
 
-  // ========== BUG FIX 1: SUBMIT HANDLER ==========
   const handleSubmit = () => {
-    // Calculate grade
     let correct = 0;
     QUESTIONS.forEach((q) => {
       if (answers[q.name] === q.correct) correct++;
     });
 
-    // Mark as submitted so unmount cleanup won't discard
     submittedRef.current = true;
 
-    // END_QUIZ saves the session to logs with current gazeIn/gazeOut data
     dispatch({ type: "END_QUIZ" });
 
-    // Show grade result
     setGrade({ score: correct, total: QUESTIONS.length });
 
     console.log(`[Quiz] Submitted — Score: ${correct}/${QUESTIONS.length}`);
   };
 
-  // ========== EXIT WITHOUT SUBMITTING ==========
   const handleExitWithoutSubmit = () => {
     if (
       confirm(
         "Exit quiz without submitting? Your quiz will NOT be saved to logs.",
       )
     ) {
-      submittedRef.current = false; // ensure discard path
+      submittedRef.current = false; 
       dispatch({ type: "DISCARD_QUIZ" } as any);
       quizStartedRef.current = false;
       setAppMode("home");
     }
   };
 
-  // ========== GRADE RESULT SCREEN ==========
-  // Shown after clicking Submit
   if (grade !== null) {
     const percentage = Math.round((grade.score / grade.total) * 100);
     const isPassed = percentage >= 50;
@@ -243,10 +206,8 @@ export function Quiz() {
     );
   }
 
-  // ========== QUIZ PAGE ==========
   return (
     <div className="container">
-      {/* BUG FIX 2: Top "Exit Quiz" button REMOVED — only Submit and Exit Without Submitting remain */}
       <div
         style={{
           display: "flex",
@@ -256,10 +217,8 @@ export function Quiz() {
         }}
       >
         <h1>🧪 Quiz</h1>
-        {/* No exit button here anymore */}
       </div>
 
-      {/* ========== REAL-TIME MONITORING ========== */}
       <div
         style={{
           display: "grid",
@@ -330,7 +289,6 @@ export function Quiz() {
         </div>
       </div>
 
-      {/* ========== QUIZ QUESTIONS ========== */}
       {QUESTIONS.map((q) => (
         <div
           key={q.name}
@@ -345,7 +303,7 @@ export function Quiz() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {q.options.map((opt) => {
-              const val = opt[0].toLowerCase(); // "a", "b", or "c"
+              const val = opt[0].toLowerCase(); 
               const isSelected = answers[q.name] === val;
               return (
                 <label
@@ -380,7 +338,6 @@ export function Quiz() {
         </div>
       ))}
 
-      {/* ========== CHEATING WARNINGS ========== */}
       {faceCount !== 1 && (
         <div
           style={{
@@ -424,14 +381,11 @@ export function Quiz() {
         </div>
       )}
 
-      {/* ========== BUTTONS: Submit + Exit Without Submitting (no Exit button) ========== */}
       <div className="button-group">
-        {/* BUG FIX 1: onClick handler added to Submit */}
         <button className="primary" onClick={handleSubmit}>
           ✅ Submit Quiz
         </button>
 
-        {/* BUG FIX 2: Only this button remains for exiting (no separate "Exit Quiz") */}
         <button className="secondary" onClick={handleExitWithoutSubmit}>
           Exit Without Submitting
         </button>
