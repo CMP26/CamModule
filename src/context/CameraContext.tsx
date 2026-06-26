@@ -1,3 +1,4 @@
+// manages the camera feed for the proctoring stuff
 import React, {
   createContext,
   useContext,
@@ -25,29 +26,26 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const mediaRef = useRef<MediaStream | null>(null);
 
-  const [cameraReady, setCameraReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
 
   const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => {
+    if (mediaRef.current) {
+      mediaRef.current.getTracks().forEach((track) => {
         track.stop();
-        console.log("[CameraContext] Stopped track:", track.kind);
       });
-      streamRef.current = null;
+      mediaRef.current = null;
     }
-    setCameraReady(false);
+    setReady(false);
   }, []);
 
   const startCamera = useCallback(async () => {
-    setError(null);
-    setCameraReady(false);
+    setCameraError(null);
+    setReady(false);
 
     try {
-      console.log("[CameraContext] Requesting camera access...");
-
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
@@ -57,15 +55,11 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
         audio: false,
       });
 
-      streamRef.current = stream;
-      console.log(
-        "[CameraContext] Camera stream acquired, tracks:",
-        stream.getTracks().length
-      );
+      mediaRef.current = stream;
 
       const video = videoRef.current;
       if (!video) {
-        setError("Video element not found");
+        setCameraError("Video element not found");
         return;
       }
 
@@ -73,83 +67,59 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
 
       return new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => {
-          reject(new Error("Video metadata load timeout"));
-        }, 10000); 
+          reject(new Error("Video load timed out"));
+        }, 8000);
+
         const onLoadedMetadata = () => {
           clearTimeout(timeout);
-          console.log(
-            "[CameraContext] Video metadata loaded, video ready to play"
-          );
-
           video.removeEventListener("loadedmetadata", onLoadedMetadata);
           video.removeEventListener("error", onError);
 
           const playPromise = video.play();
-
           if (playPromise !== undefined) {
             playPromise
               .then(() => {
-                console.log("[CameraContext] Video playing successfully");
-                setCameraReady(true);
+                setReady(true);
                 resolve();
               })
               .catch((err) => {
-                console.error("[CameraContext] Play error:", err);
-                setError(
-                  "Could not play camera stream. Check browser permissions or try a different camera."
-                );
+                setCameraError("Could not play camera stream: " + err.message);
                 reject(err);
               });
           } else {
-            console.log("[CameraContext] Using non-promise play()");
-            setCameraReady(true);
+            setReady(true);
             resolve();
           }
         };
 
-        const onError = (event: Event) => {
+        const onError = () => {
           clearTimeout(timeout);
-          console.error("[CameraContext] Video element error:", event);
           video.removeEventListener("loadedmetadata", onLoadedMetadata);
           video.removeEventListener("error", onError);
 
           const videoError = (video as HTMLVideoElement & { error?: MediaError | null }).error;
-          const errorMsg = videoError
-            ? `Video Error: ${videoError.message}`
-            : "Video element error";
-
-          setError(errorMsg);
-          reject(new Error(errorMsg));
+          setCameraError(videoError ? videoError.message : "Video element error");
+          reject(new Error(videoError?.message || "Video element error"));
         };
 
         video.addEventListener("loadedmetadata", onLoadedMetadata);
         video.addEventListener("error", onError);
       });
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : "Camera access denied or not available";
+      const msg = err instanceof Error ? err.message : "Camera access denied";
+      setCameraError(msg);
+      setReady(false);
 
-      console.error("[CameraContext] Camera initialization failed:", msg);
-      setError(msg);
-      setCameraReady(false);
-
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+      if (mediaRef.current) {
+        mediaRef.current.getTracks().forEach((track) => track.stop());
+        mediaRef.current = null;
+      }
     }
   }, []);
 
   useEffect(() => {
-    console.log("[CameraContext] Mounting, starting camera...");
-    startCamera().catch((err) => {
-      console.error("[CameraContext] Start failed:", err);
-    });
-
-    return () => {
-      console.log("[CameraContext] Unmounting, stopping camera...");
-      stopCamera();
-    };
+    startCamera().catch(() => {});
+    return () => stopCamera();
   }, [startCamera, stopCamera]);
 
   return (
@@ -157,9 +127,9 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         videoRef,
         canvasRef,
-        cameraReady,
-        stream: streamRef.current,
-        error,
+        cameraReady: ready,
+        stream: mediaRef.current,
+        error: cameraError,
         stopCamera,
         restartCamera: startCamera,
       }}

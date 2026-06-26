@@ -6,7 +6,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { useSession } from "../context/SessionContext";
+import { useSession } from "../context/AppContext";
 import "./Logs.css";
 
 export function Logs() {
@@ -39,9 +39,9 @@ export function Logs() {
   };
 
   const getFocusColor = (percentage: number) => {
-    if (percentage < 50) return "#e74c3c"; 
-    if (percentage < 65) return "#e67e22"; 
-    if (percentage < 75) return "#f39c12"; 
+    if (percentage < 50) return "#e74c3c";
+    if (percentage < 65) return "#e67e22";
+    if (percentage < 75) return "#f39c12";
     if (percentage < 85) return "#a9d961";
     return "#27ae60";
   };

@@ -1,3 +1,4 @@
+//thisis the main app state provider
 import React, {
   createContext,
   useCallback,
@@ -11,9 +12,9 @@ import type {
   GlobalState,
   SessionLogs,
 } from "../types/sessionTypes";
-import { globalReducer } from "./sessionReducer";
+import { reducer } from "./reducer";
 
-const INITIAL_STATE: GlobalState = {
+const initialState: GlobalState = {
   appMode: "home",
   sessionId: "",
   cameraVisible: false,
@@ -26,28 +27,12 @@ const INITIAL_STATE: GlobalState = {
   currentStudySession: null,
   currentQuizSession: null,
 };
-const LOGS_STORAGE_KEY = "nexalearn_logs";
+
+const storageKey = "nexalearn_logs";
 
 function generateSessionId(): string {
-  return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function initGlobalState(sessionId: string): GlobalState {
-  let sessionLogs: SessionLogs = {
-    ...INITIAL_STATE.sessionLogs,
-    sessionId,
-  };
-
-  if (typeof window !== "undefined") {
-    try {
-      const raw = window.localStorage.getItem(LOGS_STORAGE_KEY);
-      if (raw) sessionLogs = JSON.parse(raw);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  return { ...INITIAL_STATE, sessionId, sessionLogs };
+  const customEntropy = Math.random().toString(36).substring(2, 11);
+  return "session_" + Date.now() + "_" + customEntropy;
 }
 
 interface SessionContextType {
@@ -68,38 +53,48 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const sessionId = useMemo(() => generateSessionId(), []);
-  const [state, dispatch] = useReducer(
-    globalReducer,
-    sessionId,
-    initGlobalState,
-  );
 
-  React.useEffect(() => {
-    try {
-      window.localStorage.setItem(
-        LOGS_STORAGE_KEY,
-        JSON.stringify(state.sessionLogs),
-      );
-    } catch (e) {
-      console.log(e);
+  const [state, dispatch] = useReducer(reducer, sessionId, (sessionToken) => {
+    let resolvedLogs: SessionLogs = {
+      ...initialState.sessionLogs,
+      sessionId: sessionToken,
+    };
+
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        resolvedLogs = JSON.parse(raw);
+      }
     }
-  }, [state.sessionLogs]);
+
+    return {
+      ...initialState,
+      sessionId: sessionToken,
+      sessionLogs: resolvedLogs,
+    };
+  });
 
   React.useEffect(() => {
     function handleStorage(e: StorageEvent) {
-      if (e.key !== LOGS_STORAGE_KEY) return;
-      if (e.newValue === null) {
+      if (e.key !== storageKey) return;
+
+      const newRawPayload = e.newValue;
+      if (newRawPayload === null) {
         dispatch({ type: "CLEAR_LOGS" });
-        return;
-      }
-      try {
-        dispatch({ type: "LOAD_LOGS", payload: JSON.parse(e.newValue) });
-      } catch (err) {
-        console.log(err);
+      } else {
+        dispatch({ type: "LOAD_LOGS", payload: JSON.parse(newRawPayload) });
       }
     }
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  React.useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(state.sessionLogs));
+  }, [state.sessionLogs]);
+
+  const toggleCamera = useCallback(() => {
+    dispatch({ type: "TOGGLE_CAMERA" });
   }, []);
 
   const setAppMode = useCallback(
@@ -109,16 +104,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const toggleCamera = useCallback(() => {
-    dispatch({ type: "TOGGLE_CAMERA" });
+  const endStudySession = useCallback(() => {
+    dispatch({ type: "END_STUDY" });
   }, []);
 
   const startStudySession = useCallback(() => {
     dispatch({ type: "START_STUDY" });
   }, []);
 
-  const endStudySession = useCallback(() => {
-    dispatch({ type: "END_STUDY" });
+  const startQuizSession = useCallback((name: string, timeLimit?: number) => {
+    dispatch({ type: "START_QUIZ", payload: { name, timeLimit } });
   }, []);
 
   const updateStudyPresence = useCallback(
@@ -131,14 +126,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const startQuizSession = useCallback((name: string, timeLimit?: number) => {
-    dispatch({ type: "START_QUIZ", payload: { name, timeLimit } });
-  }, []);
-
-  const endQuizSession = useCallback(() => {
-    dispatch({ type: "END_QUIZ" });
-  }, []);
-
   const updateQuizGaze = useCallback(
     (gazeInTime: number, gazeOutTime: number) => {
       dispatch({
@@ -149,13 +136,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const endQuizSession = useCallback(() => {
+    dispatch({ type: "END_QUIZ" });
+  }, []);
+
   const clearLogs = useCallback(() => {
     dispatch({ type: "CLEAR_LOGS" });
-    try {
-      window.localStorage.removeItem(LOGS_STORAGE_KEY);
-    } catch (e) {
-      console.log(e);
-    }
+    localStorage.removeItem(storageKey);
   }, []);
 
   const value: SessionContextType = {

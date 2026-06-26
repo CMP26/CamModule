@@ -1,9 +1,10 @@
+// tracks attention state and logs distraction events
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { FocusLogEntry, UseAttentionOptions } from "../types";
 
 export interface UseAttentionDetectionReturn {
   isAttentive: boolean;
-  secondsUntilPause: number | null; 
+  secondsUntilPause: number | null;
   focusLog: FocusLogEntry[];
   clearLog: () => void;
 }
@@ -21,92 +22,92 @@ export function useAttentionDetection(
   const { pauseAfterSeconds = 3, onPause, onResume } = options;
 
   const [isAttentive, setIsAttentive] = useState(true);
-  const [secondsUntilPause, setSecondsUntilPause] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const [focusLog, setFocusLog] = useState<FocusLogEntry[]>([]);
 
-  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const focusLostAtRef = useRef<number | null>(null);
-  const isAttentiveRef = useRef(true);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const distractionStart = useRef<number | null>(null);
+  const attentiveRef = useRef(true);
 
-  const appendLog = useCallback((type: FocusLogEntry["type"], durationMs?: number) => {
+  const getReason = (): FocusLogEntry["type"] => {
+    if (isTabSwitched) return "tab_switch";
+    if (faceCount === 0) return "no_face";
+    return faceCount > 1 ? "multi_face" : "gaze_away";
+  };
+
+  const isDistracted = isLookingAway || isTabSwitched || faceCount === 0;
+
+  const addLog = useCallback((type: FocusLogEntry["type"], durationMs?: number) => {
     const entry: FocusLogEntry = {
       type,
       timestamp: new Date().toISOString(),
       ...(durationMs !== undefined && { durationMs }),
     };
     setFocusLog((prev) => [...prev, entry]);
-    console.log("[AttentionLog]", entry);
   }, []);
 
-  const startCountdown = useCallback(() => {
-    if (countdownRef.current !== null) return; 
-    focusLostAtRef.current = Date.now();
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setCountdown(null);
+  }, []);
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) return; 
+
+    distractionStart.current = Date.now();
     let remaining = pauseAfterSeconds;
-    setSecondsUntilPause(remaining);
+    setCountdown(remaining);
 
-    countdownRef.current = setInterval(() => {
+    timerRef.current = setInterval(() => {
       remaining -= 1;
-      if (remaining <= 0) {
-        clearInterval(countdownRef.current!);
-        countdownRef.current = null;
-        setSecondsUntilPause(null);
+      
+      if (remaining > 0) {
+        setCountdown(remaining);
+      } else {
+        clearInterval(timerRef.current!);
+        timerRef.current = null;
+        setCountdown(null);
 
-        if (isAttentiveRef.current) {
-          isAttentiveRef.current = false;
+        if (attentiveRef.current) {
+          attentiveRef.current = false;
           setIsAttentive(false);
           onPause?.();
         }
-      } else {
-        setSecondsUntilPause(remaining);
       }
     }, 1000);
   }, [pauseAfterSeconds, onPause]);
 
-  const stopCountdown = useCallback(() => {
-    if (countdownRef.current !== null) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
+  useEffect(() => {
+    if (isDistracted && !isAttentive) {
+      addLog(getReason());
     }
-    setSecondsUntilPause(null);
-  }, []);
-
-  const getDistractType = (): FocusLogEntry["type"] => {
-    if (isTabSwitched) return "tab_switch";
-    if (faceCount === 0) return "no_face";
-    if (faceCount > 1) return "multi_face";
-    return "gaze_away";
-  };
-
-  const isDistracted = isLookingAway || isTabSwitched || faceCount === 0;
+  }, [isAttentive, isDistracted]);
 
   useEffect(() => {
-    if (isDistracted) {
-      startCountdown();
-    } else {
-      stopCountdown();
+    if (!isDistracted) {
+      stopTimer();
 
-      if (!isAttentiveRef.current) {
-        const durationMs = focusLostAtRef.current
-          ? Date.now() - focusLostAtRef.current
+      if (!attentiveRef.current) {
+        const elapsed = distractionStart.current
+          ? Date.now() - distractionStart.current
           : undefined;
 
-        appendLog(getDistractType(), durationMs);
+        addLog(getReason(), elapsed);
 
-        isAttentiveRef.current = true;
+        attentiveRef.current = true;
         setIsAttentive(true);
-        focusLostAtRef.current = null;
+        distractionStart.current = null;
         onResume?.();
       }
+    } else {
+      startTimer();
     }
   }, [isDistracted]);
 
-  useEffect(() => {
-    if (!isAttentive && isDistracted) {
-      appendLog(getDistractType());
-    }
-  }, [isAttentive]);
-
   const clearLog = useCallback(() => setFocusLog([]), []);
 
-  return { isAttentive, secondsUntilPause, focusLog, clearLog };
+  return { isAttentive, secondsUntilPause: countdown, focusLog, clearLog };
 }

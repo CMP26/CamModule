@@ -14,12 +14,6 @@ export interface FocusLogEntry {
   timestamp: string;
   durationMs?: number;
 }
-
-export interface UseCameraOptions {
-  width?: number;
-  height?: number;
-  facingMode?: "user" | "environment";
-}
 export interface UseGazeOptions {
   gracePeriodMs?: number;
 }

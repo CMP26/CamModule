@@ -6,25 +6,25 @@ type FaceApi = any;
 let faceApiPromise: Promise<FaceApi> | null = null;
 
 async function loadFaceApi(): Promise<FaceApi> {
-  if (!faceApiPromise) {
-    faceApiPromise = (
-      import("@vladmandic/face-api" as any) as Promise<any>
-    ).then(async (faceapi) => {
-      const MODEL_URL =
-        "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1/model";
-      await Promise.all([
-        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-      ]);
-      return faceapi as unknown as FaceApi;
-    });
-  }
-  return faceApiPromise;
+  return (faceApiPromise =
+    faceApiPromise ||
+    (import("@vladmandic/face-api" as any) as Promise<any>).then(
+      async (faceapi) => {
+        const MODEL_URL =
+          "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1/model";
+
+        await Promise.all([
+          faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        ]);
+        return faceapi as unknown as FaceApi;
+      },
+    ));
 }
 
 export interface UseIdentityVerificationReturn {
-  identityVerified: boolean | null; 
+  identityVerified: boolean | null;
   verifying: boolean;
   verifyNow: () => Promise<void>;
   modelsReady: boolean;
@@ -64,7 +64,9 @@ export function useIdentityVerification(
 
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = referenceImageUrl;
+
+    img.onerror = () => setError("Could not load reference image.");
+
     img.onload = async () => {
       try {
         const detection = await faceapi
@@ -72,16 +74,17 @@ export function useIdentityVerification(
           .withFaceLandmarks()
           .withFaceDescriptor();
 
-        if (!detection) {
+        if (detection) {
+          referenceDescriptorRef.current = detection.descriptor;
+        } else {
           setError("No face found in reference image.");
-          return;
         }
-        referenceDescriptorRef.current = detection.descriptor;
       } catch (e) {
         setError("Failed to process reference image: " + String(e));
       }
     };
-    img.onerror = () => setError("Could not load reference image.");
+
+    img.src = referenceImageUrl;
   }, [modelsReady, referenceImageUrl]);
 
   const verifyNow = async () => {
@@ -101,19 +104,16 @@ export function useIdentityVerification(
         .withFaceLandmarks()
         .withFaceDescriptor();
 
-      if (!liveDetection) {
+      if (liveDetection) {
+        const distance = faceapi.euclideanDistance(
+          referenceDescriptorRef.current,
+          liveDetection.descriptor,
+        );
+        setIdentityVerified(distance < threshold);
+      } else {
         setIdentityVerified(false);
         setError("No face detected in webcam.");
-        setVerifying(false);
-        return;
       }
-
-      const distance = faceapi.euclideanDistance(
-        referenceDescriptorRef.current,
-        liveDetection.descriptor,
-      );
-
-      setIdentityVerified(distance < threshold);
     } catch (e) {
       setError("Verification error: " + String(e));
       setIdentityVerified(false);
@@ -122,5 +122,11 @@ export function useIdentityVerification(
     }
   };
 
-  return { identityVerified, verifying, verifyNow, modelsReady, error };
+  return {
+    verifyNow,
+    modelsReady,
+    error,
+    identityVerified,
+    verifying,
+  };
 }

@@ -39,14 +39,13 @@ export function useFaceMesh(
 
   const runLoop = useCallback(
     async (faceMesh: Awaited<ReturnType<typeof getFaceMesh>>) => {
-      if (!videoRef.current || videoRef.current.readyState < 2) {
+      const currentVideo = videoRef.current;
+      if (currentVideo && currentVideo.readyState >= 2) {
+        await faceMesh.send({ image: currentVideo });
         rafRef.current = requestAnimationFrame(() => runLoop(faceMesh));
-        return;
+      } else {
+        rafRef.current = requestAnimationFrame(() => runLoop(faceMesh));
       }
-
-      await faceMesh.send({ image: videoRef.current });
-
-      rafRef.current = requestAnimationFrame(() => runLoop(faceMesh));
     },
     [videoRef],
   );
@@ -56,6 +55,16 @@ export function useFaceMesh(
 
     let cancelled = false;
 
+    const initiateDistractionTimer = () => {
+      if (!isCurrentlyAwayRef.current && awayTimerRef.current === null) {
+        awayTimerRef.current = setTimeout(() => {
+          isCurrentlyAwayRef.current = true;
+          setIsLookingAway(true);
+          awayTimerRef.current = null;
+        }, gracePeriodMs);
+      }
+    };
+
     const setup = async () => {
       const faceMesh = await getFaceMesh();
       if (cancelled) return;
@@ -64,65 +73,52 @@ export function useFaceMesh(
         if (cancelled) return;
 
         const faces = results.multiFaceLandmarks ?? [];
-        setFaceCount(faces.length);
+        const absoluteFaceCount = faces.length;
+        setFaceCount(absoluteFaceCount);
 
-        if (faces.length === 0) {
-          if (!isCurrentlyAwayRef.current && awayTimerRef.current === null) {
-            awayTimerRef.current = setTimeout(() => {
-              isCurrentlyAwayRef.current = true;
-              setIsLookingAway(true);
-              awayTimerRef.current = null;
-            }, gracePeriodMs);
-          }
-          return;
-        }
+        if (absoluteFaceCount > 0) {
+          const primaryLandmarks = faces[0];
+          const leftEye = primaryLandmarks[226];
+          const rightEye = primaryLandmarks[446];
+          const faceWidth = Math.abs(rightEye.x - leftEye.x);
 
-        const primaryLandmarks = faces[0];
+          let scale = 0.2 / faceWidth;
+          if (scale < 0.6) scale = 0.6;
+          if (scale > 1.8) scale = 1.8;
 
-        const leftEye = primaryLandmarks[226];
-        const rightEye = primaryLandmarks[446];
-        const faceWidth = Math.abs(rightEye.x - leftEye.x);
+          const baseGazeThreshold = 0.15;
+          const baseYawThreshold = 10;
+          const basePitchThreshold = 10;
 
-        const REFERENCE_WIDTH = 0.2;
-        const MIN_SCALE = 0.6;
-        const MAX_SCALE = 1.8;
+          const gazeThreshold = baseGazeThreshold * scale;
+          const yawThreshold = baseYawThreshold * scale;
+          const pitchThreshold = basePitchThreshold * scale;
 
-        let scale = REFERENCE_WIDTH / faceWidth;
-        scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+          const gazingAway = isGazingAway(
+            primaryLandmarks,
+            gazeThreshold,
+            yawThreshold,
+            pitchThreshold,
+          );
 
-        const baseGazeThreshold = 0.15;
-        const baseYawThreshold = 10;
-        const basePitchThreshold = 10;
+          console.log(
+            `Face width: ${faceWidth.toFixed(3)}, Scale: ${scale.toFixed(2)}`,
+          );
 
-        const gazeThreshold = baseGazeThreshold * scale;
-        const yawThreshold = baseYawThreshold * scale;
-        const pitchThreshold = basePitchThreshold * scale;
-
-        const gazingAway = isGazingAway(
-          primaryLandmarks,
-          gazeThreshold,
-          yawThreshold,
-          pitchThreshold,
-        );
-        console.log(
-          `Face width: ${faceWidth.toFixed(3)}, Scale: ${scale.toFixed(2)}`,
-        );
-        if (gazingAway) {
-          if (!isCurrentlyAwayRef.current && awayTimerRef.current === null) {
-            awayTimerRef.current = setTimeout(() => {
-              isCurrentlyAwayRef.current = true;
-              setIsLookingAway(true);
-              awayTimerRef.current = null;
-            }, gracePeriodMs);
+          if (!gazingAway) {
+            clearAwayTimer();
+            if (isCurrentlyAwayRef.current) {
+              isCurrentlyAwayRef.current = false;
+              setIsLookingAway(false);
+            }
+          } else {
+            initiateDistractionTimer();
           }
         } else {
-          clearAwayTimer();
-          if (isCurrentlyAwayRef.current) {
-            isCurrentlyAwayRef.current = false;
-            setIsLookingAway(false);
-          }
+          initiateDistractionTimer();
         }
       });
+
       setModelReady(true);
       rafRef.current = requestAnimationFrame(() => runLoop(faceMesh));
     };
@@ -136,5 +132,11 @@ export function useFaceMesh(
     };
   }, [cameraReady, gracePeriodMs, runLoop]);
 
-  return { isLookingAway, faceCount, modelReady };
+  const compiledStateReturn: UseFaceMeshReturn = {
+    faceCount,
+    modelReady,
+    isLookingAway,
+  };
+
+  return compiledStateReturn;
 }

@@ -3,7 +3,7 @@ import { Home } from "./components/Home";
 import { Learning } from "./components/Learning";
 import { Logs } from "./components/Logs";
 import { Quiz } from "./components/Quiz";
-import { SessionProvider, useSession } from "./context/SessionContext";
+import { SessionProvider, useSession } from "./context/AppContext";
 import { CameraProvider, useCameraContext } from "./context/CameraContext";
 
 function AppContent() {
@@ -19,25 +19,25 @@ function AppContent() {
         muted
         playsInline
         style={{
-          display: 'none',
+          display: "none",
         }}
         data-testid="shared-video-element"
       />
       <canvas
         ref={canvasRef}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         data-testid="shared-canvas-element"
       />
 
       {error && (
         <div
           style={{
-            position: 'fixed',
+            position: "fixed",
             top: 10,
             right: 10,
-            background: '#ff6b6b',
-            color: 'white',
-            padding: '10px 15px',
+            background: "#ff6b6b",
+            color: "white",
+            padding: "10px 15px",
             borderRadius: 4,
             fontSize: 12,
             zIndex: 10000,
@@ -49,12 +49,12 @@ function AppContent() {
       {!cameraReady && (
         <div
           style={{
-            position: 'fixed',
+            position: "fixed",
             top: 10,
             left: 10,
-            background: '#ffd93d',
-            color: '#333',
-            padding: '10px 15px',
+            background: "#ffd93d",
+            color: "#333",
+            padding: "10px 15px",
             borderRadius: 4,
             fontSize: 12,
             zIndex: 10000,
@@ -66,12 +66,12 @@ function AppContent() {
       {cameraReady && (
         <div
           style={{
-            position: 'fixed',
+            position: "fixed",
             top: 10,
             left: 10,
-            background: '#51cf66',
-            color: 'white',
-            padding: '10px 15px',
+            background: "#51cf66",
+            color: "white",
+            padding: "10px 15px",
             borderRadius: 4,
             fontSize: 12,
             zIndex: 10000,
@@ -85,7 +85,6 @@ function AppContent() {
       {state.appMode === "learning" && <Learning />}
       {state.appMode === "quiz" && <Quiz />}
       {state.appMode === "logs" && <Logs />}
-
     </div>
   );
 }

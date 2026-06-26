@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "../context/AppContext";
 import { useCameraContext } from "../context/CameraContext";
-import { useSession } from "../context/SessionContext";
 import { useAttentionDetection } from "../hooks/useAttentionDetection";
 import { useBrowserMonitor } from "../hooks/useBrowserMonitor";
 import { useFaceMesh } from "../hooks/useFaceMesh";
@@ -100,7 +100,6 @@ export function Learning() {
     setAppMode("home");
   };
 
-
   if (step === "select") {
     return (
       <div className="container">
@@ -149,7 +148,7 @@ export function Learning() {
               <h2 style={{ margin: 0, marginBottom: 10, fontSize: 24 }}>
                 Article
               </h2>
-              <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>
+              <p style={{ margin: 0, opacity: 0.9, fontSize: 14, color: "white" }}>
                 Read an article and stay focused
               </p>
             </div>
@@ -187,7 +186,7 @@ export function Learning() {
               <h2 style={{ margin: 0, marginBottom: 10, fontSize: 24 }}>
                 Video
               </h2>
-              <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>
+              <p style={{ margin: 0, opacity: 0.9, fontSize: 14, color: "white" }}>
                 Watch a video and pay attention
               </p>
             </div>
@@ -457,7 +456,6 @@ export function Learning() {
         </div>
 
         <div className="video-player-wrapper" style={{ marginBottom: 30 }}>
-          
           <iframe
             id="yt-player"
             width="100%"
@@ -468,7 +466,6 @@ export function Learning() {
             allowFullScreen
             style={{ display: "block", borderRadius: 8 }}
           />
-          
         </div>
 
         {(isLookingAway || faceCount === 0 || isTabSwitched) && (

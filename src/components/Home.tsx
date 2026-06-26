@@ -1,4 +1,4 @@
-import { useSession } from "../context/SessionContext";
+import { useSession } from "../context/AppContext";
 import "./Home.css";
 
 export function Home() {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "../context/AppContext";
 import { useCameraContext } from "../context/CameraContext";
-import { useSession } from "../context/SessionContext";
 import { useBrowserMonitor } from "../hooks/useBrowserMonitor";
 import { useFaceMesh } from "../hooks/useFaceMesh";
 import "./Quiz.css";
@@ -115,7 +115,7 @@ export function Quiz() {
         "Exit quiz without submitting? Your quiz will NOT be saved to logs.",
       )
     ) {
-      submittedRef.current = false; 
+      submittedRef.current = false;
       dispatch({ type: "DISCARD_QUIZ" } as any);
       quizStartedRef.current = false;
       setAppMode("home");
@@ -303,7 +303,7 @@ export function Quiz() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {q.options.map((opt) => {
-              const val = opt[0].toLowerCase(); 
+              const val = opt[0].toLowerCase();
               const isSelected = answers[q.name] === val;
               return (
                 <label

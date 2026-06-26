@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+// tracks tab visibility and window focus
+import { useCallback, useEffect, useState } from "react";
 
 export interface UseBrowserMonitorReturn {
   isTabSwitched: boolean;
@@ -14,16 +15,12 @@ export function useBrowserMonitor(): UseBrowserMonitorReturn {
   const handleVisibility = useCallback(() => {
     const hidden = document.hidden;
     setIsTabSwitched(hidden);
-    if (hidden) {
-      setTabSwitchCount((c) => c + 1);
-      console.warn("[BrowserMonitor] Tab hidden / switched");
-    }
+    if (hidden) setTabSwitchCount((prev) => prev + 1);
   }, []);
-
+  
   const handleBlur = useCallback(() => {
     setIsTabSwitched(true);
-    setBlurCount((c) => c + 1);
-    console.warn("[BrowserMonitor] Window lost focus");
+    setBlurCount((prev) => prev + 1);
   }, []);
 
   const handleFocus = useCallback(() => {
@@ -34,15 +31,20 @@ export function useBrowserMonitor(): UseBrowserMonitorReturn {
 
   useEffect(() => {
     document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [handleVisibility]);
+
+  useEffect(() => {
     window.addEventListener("blur", handleBlur);
     window.addEventListener("focus", handleFocus);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("blur", handleBlur);
       window.removeEventListener("focus", handleFocus);
     };
-  }, [handleVisibility, handleBlur, handleFocus]);
+  }, [handleBlur, handleFocus]);
 
   return { isTabSwitched, tabSwitchCount, blurCount };
 }
