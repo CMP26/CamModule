@@ -224,17 +224,3 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
-@media (max-width: 480px) {
-  .container {
-    padding: 15px 10px;
-  }
-
-  .container h1 {
-    font-size: 20px;
-  }
-
-  .status-grid {
-    grid-template-columns: 1fr;
-  }
-}
